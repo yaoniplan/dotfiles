@@ -20,3 +20,6 @@ complete -cf doas
 alias todocli=todo.sh
 complete -F _todo todocli
 alias dotfiles='/usr/bin/git --git-dir=/home/yaoniplan/.dotfiles/ --work-tree=/home/yaoniplan'
+
+# Set Bash completion for Git
+. /usr/share/bash-completion/completions/git
