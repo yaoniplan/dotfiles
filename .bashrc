@@ -23,3 +23,6 @@ alias dotfiles='/usr/bin/git --git-dir=/home/yaoniplan/.dotfiles/ --work-tree=/h
 
 # Set Bash completion for Git
 . /usr/share/bash-completion/completions/git
+
+# Set prompt for Bash by using Starship
+eval "$(starship init bash)"
