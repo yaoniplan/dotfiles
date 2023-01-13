@@ -2,4 +2,4 @@
 	email = yaoniplan@gmail.com
 	name = yaoniplan
 [safe]
-	directory = /var/db/repos/test/
+	directory = /var/db/repos/test
