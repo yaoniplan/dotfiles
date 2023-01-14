@@ -194,11 +194,8 @@ bar {
 
 # Redshift (install "x11-misc/redshift")
 exec --no-startup-id redshift -O 1800
- 
-# Wallpaper (install "media-gfx/feh")
-exec --no-startup-id feh --bg-scale ~/app/wallpaper/dark.jpg
- 
-# Proxy (clash-for-windows)
+
+# Proxy
 exec --no-startup-id clash
  
 # Assign
