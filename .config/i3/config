@@ -52,7 +52,8 @@ bindsym $mod+Shift+q kill
 
 # start dmenu (a program launcher)
 #bindsym $mod+d exec --no-startup-id dmenu_run
-bindsym $mod+d exec rofi run -show drun
+#bindsym $mod+d exec rofi -show drun
+bindsym $mod+d exec "rofi -show combi -modes combi -combi-modes 'window,drun,run'"
 # A more modern dmenu replacement is rofi:
 # bindcode $mod+40 exec "rofi -modi drun,run -show drun"
 # There also is i3-dmenu-desktop which only displays applications shipping a
@@ -85,7 +86,7 @@ bindsym $mod+Shift+Up move up
 bindsym $mod+Shift+Right move right
 
 # split in horizontal orientation
-# avoid conflicting with "change focus" hotkey
+# Avoid conflicting with "change focus" shortcut keys
 bindsym $mod+semicolon split h
 
 # split in vertical orientation
@@ -109,6 +110,7 @@ bindsym $mod+space focus mode_toggle
 bindsym $mod+a focus parent
 
 # focus the child container
+# Avoid conflicting with Rofi shortcut keys
 #bindsym $mod+d focus child
 
 # Define names for default workspaces for which we configure key bindings later on.
@@ -192,27 +194,27 @@ bar {
         status_command i3status
 }
 
-# Redshift (install "x11-misc/redshift")
+# Redshift
 exec --no-startup-id redshift -O 1800
 
 # Proxy
 exec --no-startup-id clash
- 
+
 # Assign
 assign [class="^Google-chrome$"] number 1
- 
-# Browser (install "www-client/google-chrome")
+
+# Web browser
 exec google-chrome-stable
- 
-# Text editor (logseq)
+
+# Text editor
 exec Logseq
- 
+
 # Scratchpad
 bindsym $mod+Shift+minus move scratchpad
 bindsym $mod+minus scratchpad show
 for_window [class="^Logseq$"] move scratchpad
- 
-# Screenshot (install "media-gfx/flameshot")
+
+# Screenshot
 bindsym $mod+Shift+s exec flameshot gui
 
 # Brightness ("/sys/class" "backlight" "radeon" "brightness")
@@ -228,9 +230,9 @@ for_window [class="^.*"] border pixel 0
 gaps inner 6
 gaps outer 4
 smart_gaps on
-smart_borders on
+#smart_borders on
 
-# I3lock (a screen locker)
+# Screen locker
 bindsym $mod+o exec i3lock -c 000000
 
 # Enable compositor as a daemon
