@@ -9,7 +9,7 @@
 #
 # Please see https://i3wm.org/docs/userguide.html for a complete reference!
 
-set $mod Mod1
+set $mod Mod4
 
 # Font for window titles. Will also be used by the bar unless a different font
 # is used in the bar {} block below.
@@ -53,7 +53,7 @@ bindsym $mod+Shift+q kill
 # start dmenu (a program launcher)
 #bindsym $mod+d exec --no-startup-id dmenu_run
 #bindsym $mod+d exec rofi -show drun
-bindsym $mod+d exec "rofi -show combi -modes combi -combi-modes 'window,drun,run'"
+bindsym Mod1+d exec "rofi -show combi -modes combi -combi-modes 'window,drun,run'"
 # A more modern dmenu replacement is rofi:
 # bindcode $mod+40 exec "rofi -modi drun,run -show drun"
 # There also is i3-dmenu-desktop which only displays applications shipping a
@@ -67,7 +67,7 @@ bindsym $mod+k focus up
 bindsym $mod+l focus right
 
 # alternatively, you can use the cursor keys:
-# comment hotkey below so that avoid conflicting with chrome hotkey
+# comment hotkey below so that avoid conflicting with Chrome hotkey
 # bindsym $mod+Left focus left
 # bindsym $mod+Down focus down
 # bindsym $mod+Up focus up
@@ -93,7 +93,7 @@ bindsym $mod+semicolon split h
 bindsym $mod+v split v
 
 # enter fullscreen mode for the focused container
-bindsym $mod+f fullscreen toggle
+bindsym Mod1+f fullscreen toggle
 
 # change container layout (stacked, tabbed, toggle split)
 bindsym $mod+s layout stacking
@@ -153,10 +153,10 @@ bindsym $mod+Shift+0 move container to workspace number $ws10
 # reload the configuration file
 bindsym $mod+Shift+c reload
 # restart i3 inplace (preserves your layout/session, can be used to upgrade i3)
-bindsym $mod+Shift+r restart
+bindsym Mod1+Shift+r restart
 # exit i3 (logs you out of your X session)
 # exit i3 without mouse click
-bindsym $mod+Shift+e exit
+bindsym Mod1+Shift+e exit
 
 # resize window (you can also use the mouse for that)
 mode "resize" {
@@ -194,29 +194,6 @@ bar {
         status_command i3status
 }
 
-# Redshift
-exec --no-startup-id redshift -O 1800
-
-# Proxy
-exec --no-startup-id clash
-
-# Assign
-assign [class="^Google-chrome$"] number 1
-
-# Web browser
-exec google-chrome-stable
-
-# Text editor
-exec Logseq
-
-# Scratchpad
-bindsym $mod+Shift+minus move scratchpad
-bindsym $mod+minus scratchpad show
-for_window [class="^Logseq$"] move scratchpad
-
-# Screenshot
-bindsym $mod+Shift+s exec flameshot gui
-
 # Brightness ("/sys/class" "backlight" "radeon" "brightness")
 # Keep the backlight between 0% and 50% or your body
 # will feel uncomfortable.
@@ -229,11 +206,21 @@ for_window [class="^.*"] border pixel 0
 # Gaps
 gaps inner 6
 gaps outer 4
-smart_gaps on
+#smart_gaps on
 #smart_borders on
 
-# Screen locker
-bindsym $mod+o exec i3lock -c 000000
-
-# Enable compositor as a daemon
+# Execute applications
+exec st -e tmux
+exec --no-startup-id redshift -O 1800
+exec --no-startup-id clash
+exec google-chrome-stable
+exec Logseq
 exec picom --daemon
+bindsym Mod1+Shift+s exec flameshot gui
+bindsym Mod1+o exec i3lock -c 000000
+
+# Assign applications to workspace
+# Typing "xprop" in terminal and then click a window of application
+assign [class="^st-256color$"] number 1
+assign [class="^Google-chrome$"] number 2
+assign [class="^Logseq$"] number 3
