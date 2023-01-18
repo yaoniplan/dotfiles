@@ -53,7 +53,8 @@ bindsym $mod+Shift+q kill
 # start dmenu (a program launcher)
 #bindsym $mod+d exec --no-startup-id dmenu_run
 #bindsym $mod+d exec rofi -show drun
-bindsym Mod1+d exec "rofi -show combi -modes combi -combi-modes 'window,drun,run'"
+#bindsym Mod1+d exec "rofi -show combi -modes combi -combi-modes 'window,drun,run'"
+bindsym Mod1+d exec rofi -show window
 # A more modern dmenu replacement is rofi:
 # bindcode $mod+40 exec "rofi -modi drun,run -show drun"
 # There also is i3-dmenu-desktop which only displays applications shipping a
@@ -204,8 +205,8 @@ bindsym XF86MonBrightnessDown exec xbacklight -dec 10
 for_window [class="^.*"] border pixel 0
 
 # Gaps
-gaps inner 6
-gaps outer 4
+#gaps inner 6
+#gaps outer 4
 #smart_gaps on
 #smart_borders on
 
@@ -214,8 +215,8 @@ exec st -e tmux
 exec --no-startup-id redshift -O 1800
 exec --no-startup-id clash
 exec google-chrome-stable
-exec Logseq
-exec picom --daemon
+#exec Logseq
+#exec picom --daemon
 bindsym Mod1+Shift+s exec flameshot gui
 bindsym Mod1+o exec i3lock -c 000000
 
@@ -223,4 +224,4 @@ bindsym Mod1+o exec i3lock -c 000000
 # Typing "xprop" in terminal and then click a window of application
 assign [class="^st-256color$"] number 1
 assign [class="^Google-chrome$"] number 2
-assign [class="^Logseq$"] number 3
+#assign [class="^Logseq$"] number 3
