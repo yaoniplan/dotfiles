@@ -19,6 +19,7 @@ let g:vimwiki_list = [{'path': '~/vimwiki/',
 	                      \ 'syntax': 'markdown', 'ext': '.md'}]
 
 set noswapfile " Disable swap files for VimWiki
+autocmd TextChanged,TextChangedI * silent write " Save files automatically
 
 " List ends here. Plugins become visible to Vim after this call.
 call plug#end()
