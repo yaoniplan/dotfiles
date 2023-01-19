@@ -198,8 +198,8 @@ bar {
 # Brightness ("/sys/class" "backlight" "radeon" "brightness")
 # Keep the backlight between 0% and 50% or your body
 # will feel uncomfortable.
-bindsym XF86MonBrightnessUp exec xbacklight -inc 10
-bindsym XF86MonBrightnessDown exec xbacklight -dec 10
+bindsym XF86MonBrightnessUp exec xbacklight -inc 3
+bindsym XF86MonBrightnessDown exec xbacklight -dec 3
 
 # Set window border pixel to 0
 for_window [class="^.*"] border pixel 0
