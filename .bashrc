@@ -18,6 +18,7 @@ fi
 # Put your fun stuff here.
 complete -cf doas
 alias dotfiles='/usr/bin/git --git-dir=/home/yaoniplan/.dotfiles/ --work-tree=/home/yaoniplan'
+alias yaoniplan='vim -c VimwikiIndex'
 
 # Set Bash completion for Git
 . /usr/share/bash-completion/completions/git
