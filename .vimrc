@@ -35,4 +35,3 @@ let g:vimwiki_url_maxsave = 0
 let g:vimwiki_links_space_char = '_'
 
 set noswapfile " Disable swap files for VimWiki
-autocmd TextChanged,TextChangedI * silent write " Save files automatically
