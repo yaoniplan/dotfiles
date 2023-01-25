@@ -45,7 +45,8 @@ bindsym XF86AudioMicMute exec --no-startup-id pactl set-source-mute @DEFAULT_SOU
 floating_modifier $mod
 
 # start a terminal
-bindsym $mod+Return exec st -e tmux
+#bindsym $mod+Return exec st -e tmux
+bindsym $mod+Return exec urxvt -e tmux
 
 # kill focused window
 bindsym $mod+Shift+q kill
@@ -211,7 +212,8 @@ for_window [class="^.*"] border pixel 0
 #smart_borders on
 
 # Execute applications
-exec st -e tmux
+#exec st -e tmux
+exec urxvt -e tmux
 exec --no-startup-id redshift -O 1800
 exec --no-startup-id clash
 exec google-chrome-stable
