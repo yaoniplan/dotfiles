@@ -33,5 +33,3 @@ let g:vimwiki_conceallevel = 3
 let g:vimwiki_url_maxsave = 0
 " Replace spaces in the file names with underscores
 let g:vimwiki_links_space_char = '_'
-
-set noswapfile " Disable swap files for VimWiki
