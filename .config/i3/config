@@ -207,9 +207,10 @@ for_window [class="^.*"] border pixel 0
 
 # Execute applications
 # Add a shift key to prevent accidental touch
+# Enclose the shell command in double quotes if there are spaces
 #exec st -e tmux
 exec urxvt -e tmux
-exec kitty tmux
+exec kitty tmux -c "vim -c VimwikiIndex"
 exec --no-startup-id redshift -O 1800
 exec --no-startup-id clash
 exec google-chrome-stable
