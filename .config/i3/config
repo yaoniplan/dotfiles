@@ -209,6 +209,7 @@ for_window [class="^.*"] border pixel 0
 # Add a shift key to prevent accidental touch
 #exec st -e tmux
 exec urxvt -e tmux
+exec kitty tmux
 exec --no-startup-id redshift -O 1800
 exec --no-startup-id clash
 exec google-chrome-stable
