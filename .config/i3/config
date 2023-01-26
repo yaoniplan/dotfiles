@@ -212,7 +212,6 @@ exec --no-startup-id redshift -O 1800
 exec --no-startup-id clash
 exec google-chrome-stable
 #exec Logseq
-#exec picom --daemon
 bindsym Mod1+Shift+s exec flameshot gui
 bindsym Mod1+o exec i3lock -c 000000
 
