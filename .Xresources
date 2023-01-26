@@ -1,59 +1,32 @@
-*background: #0f0f0f
-*foreground: #c8c8c8
+! Set colors theme
+! Linux colors
+URxvt*background: #000000
+URxvt*foreground: #B2B2B2
+! black
+URxvt*color0:  #000000
+URxvt*color8:  #686868
+! red
+URxvt*color1:  #B21818
+URxvt*color9:  #FF5454
+! green
+URxvt*color2:  #18B218
+URxvt*color10: #54FF54
+! yellow
+URxvt*color3:  #B26818
+URxvt*color11: #FFFF54
+! blue
+URxvt*color4:  #1818B2
+URxvt*color12: #5454FF
+! purple
+URxvt*color5:  #B218B2
+URxvt*color13: #FF54FF
+! cyan
+URxvt*color6:  #18B2B2
+URxvt*color14: #54FFFF
+! white
+URxvt*color7:  #B2B2B2
+URxvt*color15: #FFFFFF
 
-!black
-*color0:  #251f1f
-*color8:  #5e5e5e
-!red
-*color1:  #eb4509
-*color9:  #eb4509
-!green
-*color2:  #94e76b
-*color10: #95e76b
-!yellow
-*color3:  #ffac18
-*color11: #ffac18
-!blue
-*color4:  #46aede
-*color12: #46aede
-!magenta
-*color5:  #e32c57
-*color13: #e32c57
-!cyan
-*color6:  #d6dbac
-*color14: #d6dbac
-!white
-*color7:  #efefef
-*color15: #efefef
-!! Linux colors
-!! Colors
-!URxvt*background: #000000
-!URxvt*foreground: #B2B2B2
-!! black
-!URxvt*color0:  #000000
-!URxvt*color8:  #686868
-!! red
-!URxvt*color1:  #B21818
-!URxvt*color9:  #FF5454
-!! green
-!URxvt*color2:  #18B218
-!URxvt*color10: #54FF54
-!! yellow
-!URxvt*color3:  #B26818
-!URxvt*color11: #FFFF54
-!! blue
-!URxvt*color4:  #1818B2
-!URxvt*color12: #5454FF
-!! purple
-!URxvt*color5:  #B218B2
-!URxvt*color13: #FF54FF
-!! cyan
-!URxvt*color6:  #18B2B2
-!URxvt*color14: #54FFFF
-!! white
-!URxvt*color7:  #B2B2B2
-!URxvt*color15: #FFFFFF
-!
 !-*- Perl extensions -*-
 URxvt.perl-ext-common: default,selection-to-clipboard,pasta,matcher,keyboard-select,font-size 
 
