@@ -211,7 +211,6 @@ exec urxvt -e tmux
 exec --no-startup-id redshift -O 1800
 exec --no-startup-id clash
 exec google-chrome-stable
-#exec Logseq
 bindsym Mod1+Shift+s exec flameshot gui
 bindsym Mod1+o exec i3lock -c 000000
 
@@ -219,4 +218,3 @@ bindsym Mod1+o exec i3lock -c 000000
 # Typing "xprop" in terminal and then click a window of application
 assign [class="^st-256color$"] number 1
 assign [class="^Google-chrome$"] number 2
-#assign [class="^Logseq$"] number 3
