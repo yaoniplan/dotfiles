@@ -3,6 +3,7 @@ call plug#begin(has('nvim') ? stdpath('date') . '/plugged' : '~/.vim/plugged')
 
 " Lists of plugins
 Plug 'vimwiki/vimwiki'
+Plug 'sunaku/tmux-navigate'
 
 " List ends here. Plugins become visible to Vim after this call.
 call plug#end()
