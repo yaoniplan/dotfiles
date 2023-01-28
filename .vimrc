@@ -19,7 +19,7 @@ set tabstop=4 " Insert 4 spaces when expandtab is enabled
 set shiftwidth=4 " Replace indentation with spaces
 
 " Use Markdown syntax for VimWiki
-" Replace `diary/` with `journales/`
+" Replace `diary/` with `journals/`
 let g:vimwiki_list = [{
     \ 'path': '~/test/',
     \ 'diary_rel_path': 'journals/',
