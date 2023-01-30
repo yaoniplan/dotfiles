@@ -8,8 +8,9 @@ recordSeconds=10
 widthOfFullScreen=$(xwininfo -root | gawk '/Width/ { print $2 }')
 heightOfFullScreen=$(xwininfo -root | gawk '/Height/ { print $2 }')
 #fileName="${HOME}/test/assets/`date +%F_%T`.gif"
-fileName="$HOME/`date +%F_%T`.gif"
-# Write a sound and display notification
+storageLocation=$HOME
+fileName="`date +%F_%T`.gif"
+# Write a sound notification
 soundNotification() {
     paplay /usr/share/sounds/alsa/Noise.wav
 }
@@ -18,5 +19,5 @@ soundNotification
 byzanz-record --duration=$recordSeconds \
     --x=0 --y=0 \
     --width=$widthOfFullScreen --height=$heightOfFullScreen \
-    $fileName
+    "$storageLocation/$fileName"
 soundNotification
