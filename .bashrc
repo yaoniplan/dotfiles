@@ -19,6 +19,7 @@ fi
 complete -cf doas
 alias dotfiles='/usr/bin/git --git-dir=/home/yaoniplan/.dotfiles/ --work-tree=/home/yaoniplan'
 alias yaoniplan='vim -c VimwikiIndex'
+export $(dbus-launch) # Make notify-send work
 
 # Set Bash completion for Git
 . /usr/share/bash-completion/completions/git
