@@ -5,7 +5,7 @@
 
 # Write a function about notification (e.g. sound, display)
 soundAndDisplayNotifications() {
-    paplay /usr/share/sounds/alsa/Noise.wav && export $(dbus-launch) && notify-send "timerOfTomato"
+    paplay /usr/share/sounds/alsa/Noise.wav & notify-send "timerOfTomato" &
 }
 
 # Write an infinite loop
