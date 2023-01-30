@@ -15,7 +15,7 @@ soundNotification() {
 }
 
 soundNotification
-byzanz-record --verbose --duration=$recordSeconds \
+byzanz-record --duration=$recordSeconds \
     --x=0 --y=0 \
     --width=$widthOfFullScreen --height=$heightOfFullScreen \
     $fileName
