@@ -12,7 +12,7 @@ fileName="`date +%F_%T`.gif"
 
 # Write a function that sends a string to the clipboard
 sendToTheClipboard() {
-    echo "![$fileName](../assets/$fileName)" | xclip -selection clipboard
+    echo -n "![$fileName](../assets/$fileName)" | xclip -selection clipboard
 }
 
 # Write a sound notification
