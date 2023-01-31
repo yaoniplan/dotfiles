@@ -13,7 +13,7 @@ soundAndDisplayNotifications() {
 while true
 do
     soundAndDisplayNotifications
-    sleep 900
+    sleep 15m
     soundAndDisplayNotifications
-    sleep 1200
+    sleep 20m
 done
