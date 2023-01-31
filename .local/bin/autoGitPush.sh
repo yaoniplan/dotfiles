@@ -5,7 +5,7 @@
 
 currentTime=$(date +%H:%M)
 dayOfWeek=$(date +%A)
-if [[ $dayOfWeek == "Monday" && $currentTime > "16:29" && $currentTime < "16:31" ]]
+if [[ $dayOfWeek == "Monday" && $currentTime > "16:59" && $currentTime < "17:01" ]]
 then
     cd $HOME/note/
     git add --all
