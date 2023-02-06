@@ -45,8 +45,7 @@ bindsym XF86AudioMicMute exec --no-startup-id pactl set-source-mute @DEFAULT_SOU
 floating_modifier $mod
 
 # start a terminal
-#bindsym $mod+Return exec st -e tmux
-bindsym $mod+Return exec urxvt -e tmux
+bindsym $mod+Return exec kitty
 
 # kill focused window
 bindsym $mod+Shift+q kill
@@ -207,10 +206,7 @@ for_window [class="^.*"] border pixel 0
 
 # Execute applications
 # Add a shift key to prevent accidental touch
-# Enclose the shell command in double quotes if there are spaces
-#exec st -e tmux
-exec urxvt -e tmux
-exec kitty tmux -c "vim -c VimwikiIndex"
+exec kitty tmux
 exec --no-startup-id redshift -O 1800
 exec --no-startup-id clash
 exec google-chrome-stable
@@ -222,5 +218,4 @@ for_window [class="^kitty$"] move scrachpad
 
 # Assign applications to workspace
 # Typing "xprop" in terminal and then click a window of application
-assign [class="^st-256color$"] number 1
 assign [class="^Google-chrome$"] number 2
