@@ -23,6 +23,3 @@ alias yaoniplan='vim -c VimwikiIndex'
 export $(dbus-launch)
 # Add to the path to execute scripts of the directory anywhere
 export PATH=$PATH:$HOME/.local/bin
-
-# Set Bash completion for Git
-. /usr/share/bash-completion/completions/git
