@@ -37,5 +37,3 @@ let g:vimwiki_links_space_char = '_'
 
 " Move all swap files to `~/.vim/tmp/`
 set directory^=$HOME/.vim/tmp//
-" Show relative line numbers
-set relativenumber
