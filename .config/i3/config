@@ -214,7 +214,7 @@ bindsym Mod1+Shift+s exec flameshot gui
 bindsym Mod1+Shift+o exec i3lock -c 000000
 bindsym Mod1+Shift+space move scratchpad
 bindsym Mod1+space scratchpad show
-for_window [class="^kitty$"] move scratchpad
+for_window [class="^kitty$"] floating enable, move absolute position 0px 0px, resize set 1366px 400px, move scratchpad
 
 # Assign applications to workspace
 # Typing "xprop" in terminal and then click a window of application
