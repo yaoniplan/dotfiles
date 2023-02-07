@@ -1,5 +1,7 @@
 <!-- What the project does -->
-<!-- Why the project is useful -->
+## Why the project is useful
+- Compatible with Linux servers
+- Keep it maintainable
 
 ## How users can get started with the project
 - #### Manage dotfiles with Git
