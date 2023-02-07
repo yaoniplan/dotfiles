@@ -17,7 +17,7 @@ fi
 
 # Put your fun stuff here.
 complete -cf doas
-alias dotfiles='/usr/bin/git --git-dir=/home/yaoniplan/.dotfiles/ --work-tree=/home/yaoniplan'
+alias dotfiles='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME/'
 alias yaoniplan='vim -c VimwikiIndex'
 # Make notify-send work
 export $(dbus-launch)
