@@ -207,7 +207,6 @@ exec kitty tmux
 exec --no-startup-id redshift -O 1800
 exec --no-startup-id clash
 exec google-chrome-stable
-bindsym Mod1+Shift+s exec flameshot gui
 bindsym Mod1+Shift+o exec i3lock -c 000000
 bindsym Mod1+Shift+space move scratchpad
 bindsym Mod1+space scratchpad show
