@@ -1,5 +1,5 @@
 " Plugins will be downloaded under the specified directory.
-call plug#begin(has('nvim') ? stdpath('date') . '/plugged' : '~/.vim/plugged')
+call plug#begin()
 
 " Lists of plugins
 Plug 'vimwiki/vimwiki'
