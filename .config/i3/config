@@ -51,10 +51,7 @@ bindsym $mod+Return exec kitty
 bindsym $mod+Shift+q kill
 
 # start dmenu (a program launcher)
-#bindsym $mod+d exec --no-startup-id dmenu_run
-#bindsym $mod+d exec rofi -show drun
-#bindsym Mod1+d exec "rofi -show combi -modes combi -combi-modes 'window,drun,run'"
-bindsym Mod1+d exec rofi -show window
+bindsym Mod1+d exec --no-startup-id dmenu_run
 # A more modern dmenu replacement is rofi:
 # bindcode $mod+40 exec "rofi -modi drun,run -show drun"
 # There also is i3-dmenu-desktop which only displays applications shipping a
@@ -218,4 +215,4 @@ for_window [class="^kitty$"] floating enable, move absolute position 0px 0px, re
 
 # Assign applications to workspace
 # Typing "xprop" in terminal and then click a window of application
-assign [class="^Google-chrome$"] number 2
+assign [class="^Google-chrome$"] number 1
