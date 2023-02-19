@@ -20,5 +20,3 @@ alias dotfiles='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME/'
 alias yaoniplan='vim -c VimwikiIndex'
 # Make notify-send work
 export $(dbus-launch)
-# Add to the path to execute scripts of the directory anywhere
-export PATH=$PATH:$HOME/.local/bin

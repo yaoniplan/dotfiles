@@ -10,3 +10,8 @@ fi
 export http_proxy="127.0.0.1:7890"
 export https_proxy="127.0.0.1:7890"
 export no_proxy="localhost, 127.0.0.1"
+
+# Set PATH to execute scripts anywhere if it exists
+if [ -d "$HOME/.local/bin/" ] ; then
+    export PATH="$PATH:$HOME/.local/bin/"
+fi
