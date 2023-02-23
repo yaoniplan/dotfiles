@@ -4,6 +4,7 @@ call plug#begin()
 " Lists of plugins
 Plug 'vimwiki/vimwiki'
 Plug 'sunaku/tmux-navigate'
+Plug 'dbridges/vim-markdown-runner'
 
 " List ends here. Plugins become visible to Vim after this call.
 call plug#end()
