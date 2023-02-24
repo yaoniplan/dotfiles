@@ -38,3 +38,12 @@ let g:vimwiki_links_space_char = '_'
 
 " Move all swap files to `~/.vim/tmp/`
 set directory^=$HOME/.vim/tmp//
+" Complete brackets and quotes automatically
+inoremap ( ()<Left>
+inoremap [ []<Left>
+inoremap { {}<Left>
+inoremap < <><Left>
+inoremap ' ''<Left>
+inoremap " ""<Left>
+inoremap ` ``<Left>
+inoremap ``` ```<CR>```<Up>
