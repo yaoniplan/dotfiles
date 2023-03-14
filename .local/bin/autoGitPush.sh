@@ -14,6 +14,7 @@ then
 fi
 
 cd $HOME/test/
+cat $(ls /home/yaoniplan/test/journals/*.md | sort -r) > /home/yaoniplan/test/.github/README.md
 git add --all
 git commit -m "Update at `date +%F_%T`"
 git push
