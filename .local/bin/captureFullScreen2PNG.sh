@@ -8,5 +8,11 @@ sendToTheClipboard() {
     echo -n "![$fileName](../assets/$fileName)" | xclip -selection clipboard
 }
 
-scrot -u "$HOME/$fileName"
+# Write a if condition judgement
+if [ $1 == "full" ]
+then
+    scrot "$HOME/$fileName"
+else
+    scrot -u "$HOME/$fileName"
+fi
 sendToTheClipboard
