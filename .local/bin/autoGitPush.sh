@@ -8,8 +8,6 @@ dayOfWeek=$(date +%u)
 if (( ($dayOfWeek / 2) * 2 == $dayOfWeek ))
 then
     cd $HOME/note/
-    git add --all
-    git commit -m "Update at `date +%F_%T`"
     git push origin development:master
 fi
 
