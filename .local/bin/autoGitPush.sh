@@ -1,18 +1,17 @@
 #!/usr/bin/env bash
 
-# Type "echo `date +%F_%T`" in terminal to display output
-# Refer to https://unix.stackexchange.com/questions/395933/how-to-check-if-the-current-time-is-between-2300-and-0630
+now=$(date +%F_%T)
+journalsDir=$HOME/note/journals
+readmeFile=$HOME/note/.github/README.md
 
-currentTime=$(date +%H:%M)
-dayOfWeek=$(date +%u)
-if (( ($dayOfWeek / 2) * 2 == $dayOfWeek ))
+if [[ $(( $(date +%-j) % 2)) -eq 0 && $(date +%H:%M) == "17:00" ]]
 then
     cd $HOME/note/
     git push origin development:master
 fi
 
 cd $HOME/note/
-cat $(ls /home/yaoniplan/note/journals/*.md | sort -r) > /home/yaoniplan/note/.github/README.md
+cat $(ls $journalsDir/*.md | sort -r) > $readmeFile
 git add --all
-git commit -m "Update at `date +%F_%T`"
+git commit -m "Update at $now"
 git push origin development
