@@ -4,7 +4,7 @@ now=$(date +%F_%T)
 journalsDir=$HOME/note/journals
 readmeFile=$HOME/note/.github/README.md
 
-if [[ $(( $(date +%-j) % 2)) -eq 0 && $(date +%H:%M) == "17:00" ]]
+if [[ $(( $(date +%-j) % 2)) -eq 1 && $(date +%H:%M) == "17:00" ]]
 then
     cd $HOME/note/
     git push origin development:master
