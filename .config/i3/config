@@ -204,7 +204,7 @@ for_window [class="^.*"] border pixel 0
 # Execute applications
 # Add a shift key to prevent accidental touch
 exec kitty tmux
-exec --no-startup-id redshift -O 1800
+exec --no-startup-id redshift -O 1500
 exec --no-startup-id clash
 exec chromium
 bindsym Mod1+Shift+o exec i3lock -c 000000
