@@ -1,17 +1,20 @@
 #!/usr/bin/env bash
 
-now=$(date +%F_%T)
-journalsDir=$HOME/note/journals
-readmeFile=$HOME/note/.github/README.md
+# Set variables
+repoDir="$HOME/note"
+journalsDir="$repoDir/journals"
+readmeFile="$repoDir/.github/README.md"
 
+# Push changes to master branch every odd day at 5pm
 if [[ $(( $(date +%-j) % 2)) -eq 1 && $(date +%H:%M) == "17:00" ]]
 then
-    cd $HOME/note/
-    git push origin development:master
+    git -C "$repoDir" push origin development:master
 fi
 
-cd $HOME/note/
-cat $(ls $journalsDir/*.md | sort -r) > $readmeFile
-git add --all
-git commit -m "Update at $now"
-git push origin development
+# Concatenate all journals files and write to README file
+cat $(ls "$journalsDir"/*.md | sort -r) > "$readmeFile"
+
+# Commit and push changes to development branch
+git -C "$repoDir" add --all
+git -C "$repoDir" commit -m "Update at $(date +%F_%T)"
+git -C "$repoDir" push origin development
