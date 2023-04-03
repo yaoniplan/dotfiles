@@ -9,9 +9,7 @@ country=$(curl -s https://ipinfo.io/${IPAddress}/country)
 outputResult="Your IP address in ${city}, ${country} is ${IPAddress}."
 
 # Output the result using notify-send if available, or echo otherwise
-if command -v notify-send > /dev/null
+if ! notify-send "$outputResult" 2>/dev/null
 then
-    notify-send "$outputResult"
-else
     echo "$outputResult"
 fi
