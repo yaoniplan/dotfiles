@@ -8,7 +8,7 @@ recordSeconds=10
 widthOfFullScreen=$(xwininfo -root | gawk '/Width/ { print $2 }')
 heightOfFullScreen=$(xwininfo -root | gawk '/Height/ { print $2 }')
 storageLocation=$HOME
-fileName="`date +%F_%T`.gif"
+fileName="`date +%F_%H-%M`.gif"
 
 # Write a function that sends a string to the clipboard
 sendToTheClipboard() {

@@ -16,5 +16,5 @@ cat $(ls "$journalsDir"/*.md | sort -r) > "$readmeFile"
 
 # Commit and push changes to development branch
 git -C "$repoDir" add --all
-git -C "$repoDir" commit -m "Update at $(date +%F_%T)"
+git -C "$repoDir" commit -m "Update at $(date +%F_%H-%M)"
 git -C "$repoDir" push origin development
