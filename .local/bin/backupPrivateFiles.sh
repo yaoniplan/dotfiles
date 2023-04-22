@@ -2,7 +2,7 @@
 
 # Set variables
 remoteUser="yaoniplan"
-remoteHost="192.168.10.105"
+remoteHost="192.168.10.173"
 sourceDir="/mnt/Toshiba/growthRecord"
 destinationDir="/mnt/backupPrivateFiles"
 backupFolder="$(date +%F)"
