@@ -1,0 +1,15 @@
+version: '3.1'
+services:
+  reader:
+    image: hectorqin/reader:openj9-latest
+    container_name: reader
+    restart: always
+    ports:
+      - 4396:8080
+    volumes:
+      - ~/.config/reader/logs:/logs
+      - ~/.config/reader/storage:/storage
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - READER_APP_USERBOOKLIMIT=200
+      - READER_APP_CACHECHAPTERCONTENT=true
