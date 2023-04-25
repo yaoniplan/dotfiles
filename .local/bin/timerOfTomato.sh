@@ -1,19 +1,14 @@
-#! /bin/sh
+#!/usr/bin/env bash
 
-# Timer of tomato
-# Dependencies: paplay, an audio file, notify-send
+notificationMessage="Pomodoro time is up!"
+audioFile="/home/yaoniplan/note/assets/doorbell.mp3"
 
-# Write a function about notification (e.g. sound, display)
-soundAndDisplayNotifications() {
-    paplay /usr/share/sounds/alsa/Noise.wav & notify-send "timerOfTomato" &
-}
+source master.sh
 
-# Write an infinite loop
-# Add water at 8:00, drink water at 8:15, add water at 8:35, drink water at 8:50, ...
 while true
 do
-    soundAndDisplayNotifications
-    sleep 900
-    soundAndDisplayNotifications
-    sleep 1200
+    notification
+    sleep 15m
+    notification
+    sleep 20m
 done

@@ -1,13 +1,8 @@
-#! /bin/sh
+#!/usr/bin/env bash
 
-# "How much time delay? '30s' for 30 seconds, '3m' for 30 minutes"
-# Usage: `remindMe.sh 3m &`
-# Dependencies: sleep, paplay, an audio file, notify-send
+notificationMessage="Time is up!"
+audioFile="/home/yaoniplan/note/assets/doorbell.mp3"
 
-filePath="/usr/share/sounds/alsa/doorbell.mp3"
-sleep $1
-notify-send "Time is up" &
-for times in {1..2}
-do
-    paplay $filePath
-done
+source master.sh
+
+sleep "$1"; notification
