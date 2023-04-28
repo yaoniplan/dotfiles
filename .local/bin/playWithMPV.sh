@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-mpv --speed=2 --fullscreen "$(xclip -o)"
+mpv --speed=2 --fullscreen "$(xsel -ob)"
