@@ -3,7 +3,9 @@
 # Set variables
 repoDir="$HOME/note"
 journalsDir="$repoDir/journals"
-yaoniplanFile="$repoDir/assets/yaoniplan.txt"
+indexFile="$repoDir/index.html"
+temporaryFile="/tmp/yaoniplan.txt"
+temporaryFile2="/tmp/yaoniplan2.txt"
 
 # Push changes to master branch every odd day at 5pm
 if [[ $(( $(date +%-j) % 2)) -eq 1 && $(date +%H:%M) == "17:00" ]]
@@ -11,8 +13,11 @@ then
     git -C "$repoDir" push origin development:master
 fi
 
-# Concatenate all journals files and write to yaoniplan file
-cat $(ls "$journalsDir"/*.md | sort -r) > "$yaoniplanFile"
+# Generate index.html file
+source master.sh
+convertMarkdownToHeadOfHtml
+convertMarkdownToArticleOfHtml
+convertMarkdownToBodyOfHtml
 
 # Commit and push changes to development branch
 git -C "$repoDir" add --all
