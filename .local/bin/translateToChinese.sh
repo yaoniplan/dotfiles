@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-trans -player mpv :zh "$*" | less -R
+trans -player mpg123 :zh "$*" | less -R
