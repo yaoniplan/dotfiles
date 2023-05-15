@@ -3,7 +3,7 @@
 # Set variables
 repoDir="$HOME/note"
 journalsDir="$repoDir/journals"
-indexFile="$repoDir/index.html"
+indexFile="$repoDir/assets/index.html"
 temporaryFile="$HOME/yaoniplan.md"
 
 convertMarkdownToHtml() {
@@ -18,7 +18,7 @@ convertMarkdownToHtml() {
 <head>\
   <meta name="viewport" content="width=device-width, initial-scale=1">\
   <title>yaoniplan</title>\
-  <link rel="stylesheet" href="assets/github-markdown-dark.css">\
+  <link rel="stylesheet" href="../assets/github-markdown-dark.css">\
   <style>\
     .markdown-body {\
       box-sizing: border-box;\
