@@ -5,8 +5,7 @@ audioFile="/home/yaoniplan/note/assets/doorbell.mp3"
 
 source master.sh
 
-while true
-do
+while true; do
     notification
     sleep 15m
     notification
