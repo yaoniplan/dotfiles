@@ -8,7 +8,7 @@ outputResult="Your IP address in ${city}, ${country} is ${IPAddress}."
 
 # Output the result using notify-send if available, or echo otherwise
 if command -v notify-send &>/dev/null; then
-    notify-send "$outputResult"
+    export $(dbus-launch); notify-send "$outputResult"
 else
     echo "$outputResult"
 fi

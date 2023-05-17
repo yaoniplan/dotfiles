@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 notification () {
-    notify-send "$notificationMessage" &
+    export $(dbus-launch); notify-send "$notificationMessage" &
 
     for i in {1..2}
     do
