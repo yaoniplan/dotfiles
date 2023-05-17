@@ -1,8 +1,5 @@
 #!/usr/bin/env bash
 
-if command -v tilda &>/dev/null; then
-    tilda --command tmux &>/dev/null &
-fi
 if command -v redshift &>/dev/null; then
     redshift -O 1500 &>/dev/null &
 fi
