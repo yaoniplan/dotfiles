@@ -1,5 +1,5 @@
 # What the project does
-- Make coding easer
+- Make coding easier
 
 ## Why the project is useful
 - Keep it maintainable in Linux
