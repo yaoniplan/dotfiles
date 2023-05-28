@@ -9,5 +9,5 @@ if command -v redshift &>/dev/null; then
 fi
 
 clash &>/dev/null &
-rclone mount aliyundrive:/ /mnt/aliyundrive/ &>/dev/null &
+rclone mount yaoniplan:/ /mnt/yaoniplan/ &>/dev/null &
 timerOfTomato.sh &>/dev/null &
