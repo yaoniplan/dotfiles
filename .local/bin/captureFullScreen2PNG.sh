@@ -11,9 +11,9 @@ sendToTheClipboard() {
 # Write a if condition judgement
 if [ $1 == "full" ]; then
     scrot "$storageLocation"/"$fileName"
-elif [ $1 == "select" ]; then
-    scrot --select "$storageLocation"/"$fileName"
-else
+elif [ $1 == "focused" ]; then
     scrot --focused "$storageLocation"/"$fileName"
+else
+    scrot --select "$storageLocation"/"$fileName"
 fi
 sendToTheClipboard
