@@ -14,7 +14,7 @@ mkdir -p $destinationDir/$backupFolder
 
 # Keep 30 directories only
 if [[ "$numberOfFiles" -gt 30 ]]; then
-    ls -1dr "$destinationDir"/* | tail -"$quantityToDelete" | xargs rm -rf
+    ls -1d "$destinationDir"/* | head -"$quantityToDelete" | xargs rm -rf
 fi
 
 # Copy files from the source directory to the backup folder
