@@ -3,6 +3,6 @@
 notificationMessage="Time is up!"
 audioFile="/home/yaoniplan/note/assets/doorbell.mp3"
 
-source master.sh
+source $HOME/.local/bin/master.sh
 
 sleep "$1"; notification
