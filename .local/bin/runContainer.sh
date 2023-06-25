@@ -8,7 +8,7 @@ portInfo=$(docker ps --format "{{.Ports}}" | awk -F'->' '{print $1}')
 containerID=$(docker ps --format "{{.ID}} {{.Ports}}" | awk '/'"$searchString"'/ {print $1}')
 
 if echo $(ip address) | grep --quiet "$localIPAddress"; then
-    ssh yaoniplan 'bash -c "source ~/.local/bin/runContainer.sh"'
+    ssh yaoniplan 'bash -c "source ~/.local/bin/runContainer.sh"' &
 else
     # Determine if the container is running or not
     if echo "$portInfo" | grep --quiet "$searchString"; then
