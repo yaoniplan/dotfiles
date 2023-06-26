@@ -15,8 +15,9 @@ else
         docker stop "$containerID"
     fi
 
-    # Remove images with none tag
+    # Remove images with none and yourName tag
     docker images --filter "dangling=true" --quiet | xargs -r docker rmi --force
+    docker images | awk '/'"$yourName"'/ {print $3}' | xargs -r docker rm --force
 
     # Build the Docker image
     docker build --tag "$yourName" ~/note/
