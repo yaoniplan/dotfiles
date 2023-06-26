@@ -12,12 +12,12 @@ if echo $(ip address) | grep --quiet "$localIPAddress"; then
 else
     # Determine if the container is running or not
     if echo "$portInfo" | grep --quiet "$searchString"; then
-        docker stop "$containerID"
+        docker stop "$containerID" && docker rm "$containerID"
     fi
 
     # Remove images with none and yourName tag
     docker images --filter "dangling=true" --quiet | xargs -r docker rmi --force
-    docker images | awk '/'"$yourName"'/ {print $3}' | xargs -r docker rm --force
+    docker images | awk '/'"$yourName"'/ {print $3}' | xargs -r docker rmi --force
 
     # Build the Docker image
     docker build --tag "$yourName" ~/note/
