@@ -10,7 +10,7 @@ containerID=$(docker ps --format "{{.ID}} {{.Ports}}" | awk '/'"$searchString"'/
 # Determine whether it is on the local
 if echo $(ip address) | grep --quiet "$localIPAddress"; then
     # Push code to the server and run the container on it
-    git -C $HOME/note add --all; git -C $HOME/note commit -m "Update at +%F_%H-%M"
+    git -C $HOME/note add --all; git -C $HOME/note commit -m "Update at $(date +%F_%H-%M)"
     git -C $HOME/note push git@192.168.10.100:/var/git/note.git development
     ssh yaoniplan 'bash -c "source ~/.local/bin/runContainer.sh"' &
 else
