@@ -18,4 +18,8 @@ if [[ "$numberOfFiles" -gt 15 ]]; then
 fi
 
 # Copy files from the source directory to the backup folder
-rsync -av --exclude="*.iso" $remoteUser@$remoteHost:"$sourceDir/" "$destinationDir/$backupFolder/"
+if command -v rsync &>/dev/null; then
+    rsync -av --exclude="*.iso" $remoteUser@$remoteHost:"$sourceDir/" "$destinationDir/$backupFolder/"
+else
+    $HOME/.nix-profile/bin/rsync -av --exclude="*.iso" $remoteUser@$remoteHost:"$sourceDir/" "$destinationDir/$backupFolder/"
+fi
