@@ -2,4 +2,8 @@
 
 #Dependencies: brightnessctl
 
-brightnessctl set "$@"%
+if [[ $# -ne 0 ]]; then
+    brightnessctl set "$@"%
+else
+    brightnessctl set 20%
+fi
