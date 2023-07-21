@@ -16,8 +16,8 @@ if command -v rclone && ! pgrep rclone; then
     rclone mount yaoniplan:/ /mnt/yaoniplan --header "Referer:" &>/dev/null &
 fi
 
-if command -v redshift && ! pgrep redshift; then
-    redshift -x; redshift -O 1500 &>/dev/null &
+if command -v sct ; then
+    sct 1500
 fi
 
 if ! ps aux | grep -v grep | grep aolaStar; then
