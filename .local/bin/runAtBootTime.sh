@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-if commmand -v feh &>/dev/null; then
-    feh $HOME/note/assets/dark.jpg &>/dev/null &
+if command -v feh &>/dev/null; then
+    feh --bg-fill $HOME/note/assets/dark.jpg
 fi
 
 if command -v tilda &>/dev/null && ! pgrep tilda; then
