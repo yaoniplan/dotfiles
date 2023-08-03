@@ -28,10 +28,6 @@ if command -v sct; then
     fi
 fi
 
-if ! ps aux | grep -v grep | grep aolaStar; then
-    mpv --shuffle --loop-playlist /mnt/grow/230601aolaStar/ &>/dev/null &
-fi
-
 if ! ps aux | grep -v grep | grep timerOfTomato.sh; then
     timerOfTomato.sh &>/dev/null &
 fi
