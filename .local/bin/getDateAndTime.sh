@@ -3,9 +3,9 @@
 # Dependencies: notify-send, gtts-cli, mpg123
 
 # Set variables
-currentDate=$(date +%F)
-currentTime=$(date +%H:%M)
-currentWeekday=$(date +%A)
+currentDate=$(date +%x) # 08/20/2023
+currentTime=$(date +%H:%M) # 10:03
+currentWeekday=$(date +%A) # Sunday
 
 # Check if the first argument is coorsponding string
 if [[ "$1"  == "date" ]]; then
