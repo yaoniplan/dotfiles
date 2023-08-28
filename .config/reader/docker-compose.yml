@@ -11,5 +11,23 @@ services:
       - ~/.config/reader/storage:/storage
     environment:
       - SPRING_PROFILES_ACTIVE=prod
-      - READER_APP_USERBOOKLIMIT=200
       - READER_APP_CACHECHAPTERCONTENT=true
+      - READER_APP_REMOTEWEBVIEWAPI=http://readerwebview:8050
+  readerwebview:
+    image: hectorqin/remote-webview
+    container_name: readerwebview
+    restart: always
+    environment:
+      - TZ=Asia/Shanghai
+  watchtower:
+    image: containrrr/watchtower
+    container_name: watchtower
+    restart: always
+    environment:
+        - TZ=Asia/Shanghai
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: reader readerwebview watchtower --cleanup --schedule "0 0 4 * * *"
+volumes:
+  reader:
+  readerwebview:
