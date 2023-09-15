@@ -1,7 +1,7 @@
 version: '3'
 services:
   note:
-    image: yaoniplan/note:2023-09-12
+    image: yaoniplan/note:latest
     container_name: note
     restart: always
     ports:
