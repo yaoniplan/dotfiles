@@ -22,14 +22,14 @@ if echo $(ip address) | grep --quiet "$yourLocalIPAddress"; then
     docker push "$yourImage":latest
     docker tag "$yourImage":latest "$yourImage":"$yourTag" && \
     docker push "$yourImage":"$yourTag" &
-    ssh yaoniplan 'bash -c "source ~/.local/bin/runContainer.sh"' &
+    ssh yaoniplan 'bash -c "source ~/.local/bin/runContainer.sh"'
 else
     # Run the Docker container on the server
     if [[ -x /usr/bin/docker-compose ]]; then
         cd "$yourPathIncludingDockerComposeYml"/ && /usr/bin/docker-compose up --detach
     elif [[ -x $HOME/.nix-profile/bin/docker-compose ]]; then
         # Maybe using the package manager "Nix"
-        cd "$yourPathIncludingDockerComposeYml"/ && $HOME/.nix-profile/bin/docker-compose --detach
+        cd "$yourPathIncludingDockerComposeYml"/ && $HOME/.nix-profile/bin/docker-compose up --detach
     else
         echo "docker-compose command not found"
     fi
