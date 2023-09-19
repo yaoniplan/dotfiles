@@ -6,7 +6,7 @@ yourImage="yaoniplan/note"
 yourTag=$(date +%F) # (e.g. 2023-09-17)
 yourPathIncludingDockerfile="$HOME/note"
 yourPathIncludingDockerComposeYml="$HOME/.config/note"
-yourLocalIPAddress="192.168.10.100"
+yourLocalIPAddress="192.168.10.105"
 
 # Remove existing runing containers
 docker ps --format "{{.ID}} {{.Image}}" | awk '/'"yaoniplan"'/ {print $1}' | xargs -r docker stop {} && docker rm {}
