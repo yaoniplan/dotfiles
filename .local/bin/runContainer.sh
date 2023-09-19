@@ -25,5 +25,12 @@ if echo $(ip address) | grep --quiet "$yourLocalIPAddress"; then
     ssh yaoniplan 'bash -c "source ~/.local/bin/runContainer.sh"' &
 else
     # Run the Docker container on the server
-    cd "$yourPathIncludingDockerComposeYml" && docker-compose up --detach
+    if [[ -x /usr/bin/docker-compose ]]; then
+        cd "$yourPathIncludingDockerComposeYml"/ && /usr/bin/docker-compose up --detach
+    elif [[ -x $HOME/.nix-profile/bin/docker-compose ]]; then
+        # Maybe using the package manager "Nix"
+        cd "$yourPathIncludingDockerComposeYml"/ && $HOME/.nix-profile/bin/docker-compose --detach
+    else
+        echo "docker-compose command not found"
+    fi
 fi
