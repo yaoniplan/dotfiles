@@ -1,7 +1,6 @@
 #!/usr//bin/env bash
 
 # Set variables
-yourName="yaoniplan"
 yourImage="yaoniplan/note"
 yourTag=$(date +%F) # (e.g. 2023-09-17)
 yourPathIncludingDockerfile="$HOME/note"
@@ -9,11 +8,11 @@ yourPathIncludingDockerComposeYml="$HOME/.config/note"
 yourLocalIPAddress="192.168.10.105"
 
 # Remove existing runing containers
-docker ps --format "{{.ID}} {{.Image}}" | awk '/'"yaoniplan"'/ {print $1}' | xargs -r docker stop {} && docker rm {}
+docker ps | grep "$yourImage" | awk '{print $1}' | xargs -r docker stop {} && docker rm {}
 
 # Remove images with none and yourName tag
 docker images --filter "dangling=true" --quiet | xargs -r docker rmi --force
-docker images | awk '/'"$yourName"'/ {print $3}' | xargs -r docker rmi --force
+docker images | grep "$yourImage" | awk '{print $3}' | xargs -r docker rmi --force
 
 # Determine whether it is on the local
 if echo $(ip address) | grep --quiet "$yourLocalIPAddress"; then
