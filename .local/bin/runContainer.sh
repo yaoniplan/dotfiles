@@ -1,11 +1,11 @@
-#!/usr//bin/env bash
+#!/usr/bin/env bash
 
 # Set variables
 yourImage="yaoniplan/note"
 yourTag=$(date +%F) # (e.g. 2023-09-17)
 yourPathIncludingDockerfile="$HOME/note"
 yourPathIncludingDockerComposeYml="$HOME/.config/note"
-yourLocalIPAddress="192.168.10.105"
+yourLocalIPAddress="192.168.10.104"
 
 # Remove existing runing containers
 docker ps | grep "$yourImage" | awk '{print $1}' | xargs -r docker stop {} && docker rm {}
