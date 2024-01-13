@@ -3,21 +3,18 @@
 # Dependencies: xclip or xsel, curl
 
 # Set variables
-defaultTag="#todo"
-yourHTTPRequest="http://192.168.10.100:5230/api/v1/memo"
-yourAccessToken="eyJhbGciOiJIUzI1NiIsImtpZCI6InYxIiwidHlwIjoiSldUIn0.eyJuYW1lIjoieWFvbmlwbGFuIiwiaXNzIjoibWVtb3MiLCJzdWIiOiIxIiwiYXVkIjpbInVzZXIuYWNjZXNzLXRva2VuIl0sImlhdCI6MTY5NDg3NDI5MH0.FV_4Ml5mLBwrEfwwMoD-b-_noFAMtR0L157D87phPew"
-yourContent="$@"
+yourHTTPRequest="http://192.168.10.107:2004/diary"
 
-if command -v xclip; then
-    yourClipboard="$(xclip -selection clipboard)"
+if [[ "$1" == "--no-clipboard" ]]; then
+    yourContent="${@:2}"
 else
-    yourClipboard="$(xsel --output --clipboard)"
+    if command -v xclip; then
+        yourClipboard="$(xclip -selection clipboard)"
+    else
+        yourClipboard="$(xsel --output --clipboard)"
+    fi
+    yourContent="$yourClipboard # $@"
 fi
-yourClipboardWithNewlines=$(echo -e "$yourClipboard" | sed ':a;N;$!ba;s/\n/\\n/g')
-yourContentWithTags="- $yourClipboardWithNewlines # $yourContent $defaultTag"
 
 # Make the HTTP request with cURL
-curl "$yourHTTPRequest" \
-   -H "Accept: application/json" \
-   -H "Authorization: Bearer $yourAccessToken" \
-   -d "{\"content\":\"$yourContentWithTags\"}" -m 10
+curl --request POST --data "entry=$yourContent" "$yourHTTPRequest"
