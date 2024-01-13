@@ -7,5 +7,3 @@ services:
     restart: always
     ports:
       - 2004:2004
-    volumes:
-      - ./:/var/diary
