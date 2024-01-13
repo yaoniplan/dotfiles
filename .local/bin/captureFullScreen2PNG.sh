@@ -1,11 +1,15 @@
 #! /bin/sh
 
-#Capture a window to PNG file
+# Capture a window to PNG file
 
 storageLocation=$HOME
 fileName=$(date +%F_%H-%M.png)
 sendToTheClipboard() {
-    echo -n "![$fileName](../assets/$fileName)" | xclip -selection clipboard
+    if command -v xclip &>/dev/null; then
+        echo -n "![$fileName](../assets/$fileName)" | xclip -selection clipboard
+    else
+        echo -n "![$fileName](../assets/$fileName)" | xsel --input --clipboard
+    fi
 }
 
 # Write a if condition judgement
