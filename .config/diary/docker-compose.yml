@@ -1,0 +1,11 @@
+version: '3'
+
+services:
+  diary:
+    image: yaoniplan/diary:latest
+    container_name: diary
+    restart: always
+    ports:
+      - 2004:2004
+    volumes:
+      - ./:/var/diary
