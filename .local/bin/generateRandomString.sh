@@ -9,6 +9,8 @@ if command -v xclip; then
     echo $generateRandomString@gmail.com | xclip -selection clipboard
 elif command -v xsel; then
     echo $generateRandomString@gmail.com | xsel --input --clipboard
+elif command -v wl-copy; then
+    echo $generateRandomString@gmail.com | wl-copy
 else
-    echo "xclip or xsel not found"
+    echo "xclip, xsel or wl-copy not found"
 fi
