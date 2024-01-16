@@ -5,7 +5,8 @@ yourImage="yaoniplan/note"
 yourTag=$(date +%F) # (e.g. 2023-09-17)
 yourPathIncludingDockerfile="$HOME/note"
 yourPathIncludingDockerComposeYml="$HOME/.config/note"
-yourLocalIPAddress="192.168.10.104"
+yourLocalIPAddress="100.80.81.110"
+yourServerAlias="server"
 
 # Remove existing runing containers
 docker ps | grep "$yourImage" | awk '{print $1}' | xargs -r docker stop {} && docker rm {}
@@ -21,7 +22,7 @@ if echo $(ip address) | grep --quiet "$yourLocalIPAddress"; then
     docker push "$yourImage":latest
     docker tag "$yourImage":latest "$yourImage":"$yourTag" && \
     docker push "$yourImage":"$yourTag" &
-    ssh yaoniplan 'bash -c "source ~/.local/bin/runContainer.sh"'
+    ssh "$yourServerAlias" 'bash -c "source ~/.local/bin/runContainer.sh"'
 else
     # Run the Docker container on the server
     if [[ -x /usr/bin/docker-compose ]]; then
