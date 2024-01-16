@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# Dependencies: marked
+
 source $HOME/.local/bin/master.sh
 
 convertMarkdownToHtml() {
