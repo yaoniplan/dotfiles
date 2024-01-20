@@ -8,8 +8,8 @@ URL="$@"
 destinationDir="/mnt/yaoniplan/chinaMobile"
 
 setProxy() {
-    export http_proxy="192.168.10.104:7890"
-    export https_proxy="192.168.10.104:7890"
+    export http_proxy="100.80.81.110:7890"
+    export https_proxy="100.80.81.110:7890"
     export no_proxy="localhost, 127.0.0.1"
 }
 
