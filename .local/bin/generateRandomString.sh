@@ -3,14 +3,16 @@
 # Generate random string
 # At least one uppercase letter, one lowercase letter, one number, and one special symbol
 
-generateRandomString=$(openssl rand -base64 11)
+generateRandomString=$(openssl rand -base64 11 | tr -d '\n')
 
-if command -v xclip; then
-    echo $generateRandomString@gmail.com | xclip -selection clipboard
-elif command -v xsel; then
-    echo $generateRandomString@gmail.com | xsel --input --clipboard
-elif command -v wl-copy; then
-    echo $generateRandomString@gmail.com | wl-copy
+if [[ "$XDG_SESSION_TYPE" = "wayland" ]]; then
+    echo "$generateRandomString@gmail.com" | wl-copy
 else
-    echo "xclip, xsel or wl-copy not found"
+    if command -v xclip; then
+        echo $generateRandomString@gmail.com | xclip -selection clipboard
+    elif command -v xsel; then
+        echo $generateRandomString@gmail.com | xsel --input --clipboard
+    else
+        echo "Command xclip or xsel not found."
+    fi
 fi
