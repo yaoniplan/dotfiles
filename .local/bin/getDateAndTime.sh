@@ -1,30 +1,31 @@
 #!/usr/bin/env bash
 
-# Dependencies: notify-send, gtts-cli, mpg123
+# Dependencies: tofi, notify-send, gtts-cli, mpg123
 
 # Set variables
-currentDate=$(date +%x) # e.g. 08/20/2023
-currentTime=$(date +%H:%M) # e.g. 10:03
-currentWeekday=$(date +%A) # e.g. Sunday
+currentData="It's $(date +%A), $(date +%B) $(date +%d), $(date +%Y)." # e.g. It's Monday, Feburary 26, 2024.
+currentTime="It's $(date +%H:%M)." # e.g. It's 10:03.
 
 if [[ "$XDG_SESSION_TYPE" = "wayland" ]]; then
-    if [[ "$1"  == "date" ]]; then
-        notify-send "$currentDate" && gtts-cli "$currentDate" | mpg123 -
-    elif [[ "$1" == "time" ]]; then
-        notify-send "$currentTime" && gtts-cli "$currentTime" | mpg123 -
-    elif [[ "$1" == "weekday" ]]; then
-        notify-send "$currentWeekday" && gtts-cli "$currentWeekday" | mpg123 -
-    else
-        notify-send "$currentTime"; gtts-cli "$currentTime" | mpg123 -
-    fi
+    selected_option=$(echo -e "date\ntime" | tofi)
+
+    case "$selected_option" in
+        "date")
+            notify-send "Date" "$currentData" && gtts-cli "$currentData" | mpg123 -
+            ;;
+        "time")
+            notify-send "Time" "$currentTime" && gtts-cli "$currentTime" | mpg123 -
+            ;;
+        *)
+            notify-send "Time" "$currentTime" && gtts-cli "$currentTime" | mpg123 -
+            ;;
+    esac
 else
     # Check if the first argument is coorsponding string
     if [[ "$1"  == "date" ]]; then
         export $(dbus-launch); notify-send "$currentDate" && gtts-cli "$currentDate" | mpg123 -
     elif [[ "$1" == "time" ]]; then
         export $(dbus-launch); notify-send "$currentTime" && gtts-cli "$currentTime" | mpg123 -
-    elif [[ "$1" == "weekday" ]]; then
-        export $(dbus-launch); notify-send "$currentWeekday" && gtts-cli "$currentWeekday" | mpg123 -
     else
         export $(dbus-launch); notify-send "$currentTime" && gtts-cli "$currentTime" | mpg123 -
     fi
