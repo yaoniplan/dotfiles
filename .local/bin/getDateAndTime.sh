@@ -3,7 +3,7 @@
 # Dependencies: tofi, notify-send, gtts-cli, mpg123
 
 # Set variables
-currentData="It's $(date +%A), $(date +%B) $(date +%d), $(date +%Y)." # e.g. It's Monday, Feburary 26, 2024.
+currentData="It's $(date +%A), $(date +%B)$(date +%e), $(date +%Y)." # e.g. It's Friday, March 1, 2024.
 currentTime="It's $(date +%H:%M)." # e.g. It's 10:03.
 
 if [[ "$XDG_SESSION_TYPE" = "wayland" ]]; then
