@@ -1,23 +1,52 @@
 #! /bin/sh
 
-# Capture a window to PNG file
+# Dependencies: hyprctl, jq, grim, wl-copy, notify-send, scrot, xclip, xsel
 
-storageLocation=$HOME
-fileName=$(date +%F_%H-%M.png)
-sendToTheClipboard() {
-    if command -v xclip &>/dev/null; then
-        echo -n "![$fileName](../assets/$fileName)" | xclip -selection clipboard
-    else
-        echo -n "![$fileName](../assets/$fileName)" | xsel --input --clipboard
-    fi
-}
+# Check if the display server protocol is Wayland
+if [[ "$XDG_SESSION_TYPE" = "wayland" ]]; then
+    fileName="$HOME/$(date +%Y-%m-%d-%H%M%S.png)"
+    selected_option=$(echo -e "full\nactive\nselect" | tofi)
 
-# Write a if condition judgement
-if [ $1 == "full" ]; then
-    scrot "$storageLocation"/"$fileName"
-elif [ $1 == "focused" ]; then
-    scrot --focused "$storageLocation"/"$fileName"
+    case "$selected_option" in
+        "full")
+            grim "$fileName"
+            ;;
+        "active")
+            # Check if the desktop is Hyprland
+            if [[ "$XDG_CURRENT_DESKTOP" = "Hyprland" ]]; then
+                geometry=$(hyprctl -j activewindow | jq -r '"\(.at[0]),\(.at[1]) \(.size[0])x\(.size[1])"')
+
+                grim -g "$geometry" "$fileName"
+            else
+                echo "Error: Your \$XDG_CURRENT_DESKTOP is not Hyprland."
+                exit 0
+            fi
+            ;;
+        "select")
+            grim -g "$(slurp)" "$fileName"
+            ;;
+    esac
+    # Copy file name to clipboard
+    echo "$fileName" | wl-copy
+    notify-send "Screenshot" "$fileName"
 else
-    scrot --select "$storageLocation"/"$fileName"
+    storageLocation=$HOME
+    fileName=$(date +%F_%H-%M.png)
+    sendToTheClipboard() {
+        if command -v xclip &>/dev/null; then
+            echo -n "![$fileName](../assets/$fileName)" | xclip -selection clipboard
+        else
+            echo -n "![$fileName](../assets/$fileName)" | xsel --input --clipboard
+        fi
+    }
+
+    # Write a if condition judgement
+    if [ $1 == "full" ]; then
+        scrot "$storageLocation"/"$fileName"
+    elif [ $1 == "focused" ]; then
+        scrot --focused "$storageLocation"/"$fileName"
+    else
+        scrot --select "$storageLocation"/"$fileName"
+    fi
+    sendToTheClipboard
 fi
-sendToTheClipboard
