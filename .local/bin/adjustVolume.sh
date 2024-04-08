@@ -6,7 +6,7 @@
 current_volume=$(pactl list sinks | grep 'Volume' | head -1 | awk '{print $5}' | sed 's/%//')
 
 # Prompt the user to enter the desired volume level
-new_volume=$(tofi --prompt-text "Set Volume Level $current_volume to (0-100): ")
+new_volume=$(echo "" | tofi --prompt-text "Set Volume Level $current_volume to (0-100): ")
 
 # Validate the input (check if it's a number)
 if [[ ! $new_volume =~ ^[0-9]+$ ]]; then
