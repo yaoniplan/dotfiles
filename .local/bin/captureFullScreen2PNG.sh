@@ -25,6 +25,10 @@ if [[ "$XDG_SESSION_TYPE" = "wayland" ]]; then
         "select")
             grim -g "$(slurp)" "$fileName"
             ;;
+        *)
+            echo "Invalid selection. Aborting."
+            exit 1
+            ;;
     esac
     # Copy file name to clipboard
     echo "$fileName" | wl-copy
