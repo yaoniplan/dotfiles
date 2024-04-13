@@ -10,7 +10,7 @@ new_volume=$(echo "" | tofi --prompt-text "Set Volume Level $current_volume to (
 
 # Validate the input (check if it's a number)
 if [[ ! $new_volume =~ ^[0-9]+$ ]]; then
-    notify-send "Invalid Input" "Please enter a valid number between 0 and 100."
+    echo "Invalid Input" "Please enter a valid number between 0 and 100."
     exit 1
 fi
 
