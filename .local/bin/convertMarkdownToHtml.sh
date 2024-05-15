@@ -17,7 +17,7 @@ convertMarkdownToHtml() {
   <meta charset="UTF-8">\
   <meta name="viewport" content="width=device-width, initial-scale=1">\
   <title>yaoniplan</title>\
-  <link rel="icon" href="../assets/favicon.png" type="image/png">\
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">\
   <link rel="stylesheet" href="../assets/github-markdown-dark.css">\
   <link rel="stylesheet" href="../assets/katex.min.css">\
   <script defer src="../assets/katex.min.js"></script>\
