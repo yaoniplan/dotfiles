@@ -1,10 +1,12 @@
-#! /bin/sh
+#!/usr/bin/env bash
 
-# Dependencies: hyprctl, jq, grim, wl-copy, notify-send, scrot, xclip, xsel
+# Dependencies: tofi, grim, hyprctl, jq, slurp, wl-copy, notify-send, scrot, xclip, xsel
 
 # Check if the display server protocol is Wayland
 if [[ "$XDG_SESSION_TYPE" = "wayland" ]]; then
-    fileName="$HOME/$(date +%Y-%m-%d-%H%M%S.png)"
+    # Set the file name for yourself
+    fileName="/mnt/grow/image/$(date +%Y-%m-%d-%H%M%S.png)"
+
     selected_option=$(echo -e "full\nactive\nselect" | tofi)
 
     case "$selected_option" in
