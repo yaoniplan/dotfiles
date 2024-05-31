@@ -1,0 +1,7 @@
+services:
+  parse:
+    image: yaoniplan/parse:latest
+    container_name: parse
+    restart: always
+    ports:
+      - 2005:80
