@@ -1,6 +1,6 @@
 services:
   parse:
-    image: yaoniplan/parse:latest
+    build: .
     container_name: parse
     restart: always
     ports:
