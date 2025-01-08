@@ -1,7 +1,0 @@
-services:
-  note:
-    build: .
-    container_name: note
-    restart: always
-    ports:
-      - 2003:80
