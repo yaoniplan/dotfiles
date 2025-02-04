@@ -1,9 +1,0 @@
-services:
-  diary:
-    build: .
-    container_name: diary
-    restart: always
-    ports:
-      - 2004:2004
-    volumes:
-      - ./:/var/diary
