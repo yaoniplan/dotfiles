@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
-# Dependencies: wallpaper files, swww, tofi, notify-send, feh
+# Dependencies: wallpaper files, awww, tofi, curl, jq, rsync, notify-send, feh
 
 # Set variables
-wallpaper_directory="/mnt/yaoniplan/interestAndHobby/wallpaper"
+wallpaper_directory="/mnt/yaoniplan/chinaTelecom/wallpaper"
 
 # Check if the display server protocol is Wayland
 if [[ "$XDG_SESSION_TYPE" = "wayland" ]]; then
@@ -24,7 +24,7 @@ if [[ "$XDG_SESSION_TYPE" = "wayland" ]]; then
     random_wallpaper="$(shuf --head-count 1 "$wallpaper_list")"
 
     # Get current wallpaper (Even if file name contains spaces)
-    current_wallpaper="$(basename "$(swww query | sed --silent 's/.*image: //p')")"
+    current_wallpaper="$(basename "$(awww query | sed --silent 's/.*image: //p')")"
 
     # Get next wallpaper
     next_wallpaper="$(grep -x "$current_wallpaper" -A 1 "$wallpaper_list" | tail -1)"
@@ -38,16 +38,27 @@ if [[ "$XDG_SESSION_TYPE" = "wayland" ]]; then
     previous_wallpaper="$(grep -x "$current_wallpaper" -B 2 "$wallpaper_list" | tail -1)"
 
     # Interact with tofi
-    selected_option=$(echo -e "random\nnext\ndelete\nprevious\nregenerate" | tofi)
+    selected_option=$(echo -e "wallhaven\nrandom\nnext\ndelete\nprevious\nregenerate" | tofi)
 
     case "$selected_option" in
+        "wallhaven")
+            image_url=$(curl -s "https://wallhaven.cc/api/v1/search?q=fractal&purity=100&sorting=random" | jq -r '.data[0].path')
+            file_name=$(basename "$image_url")
+            temp_file="/tmp/$file_name"
+            curl -L -o "$temp_file" "$image_url"
+            awww img --transition-type any "$temp_file"
+            notify-send "Set wallpaper" "$file_name"
+            # Move files but safer than `mv`
+            rsync --archive --remove-source-files "$temp_file" "$wallpaper_directory"/
+            generate_wallpaper_list
+            ;;
         "random")
-            swww img --transition-type any "$wallpaper_directory"/"$random_wallpaper"
+            awww img --transition-type any "$wallpaper_directory"/"$random_wallpaper"
             notify-send "Random wallpaper" "$random_wallpaper"
             ;;
         "next")
             # Set next wallpaper
-            swww img --transition-type any "$wallpaper_directory"/"$next_wallpaper"
+            awww img --transition-type any "$wallpaper_directory"/"$next_wallpaper"
             notify-send "Set wallpaper" "$next_wallpaper"
             ;;
         "delete")
@@ -55,12 +66,12 @@ if [[ "$XDG_SESSION_TYPE" = "wayland" ]]; then
             rm "$wallpaper_directory"/"$current_wallpaper" &
             notify-send "Delete wallpaper" "$current_wallpaper"
             # Set next wallpaper
-            swww img --transition-type any "$wallpaper_directory"/"$next_wallpaper"
+            awww img --transition-type any "$wallpaper_directory"/"$next_wallpaper"
             notify-send "Set wallpaper" "$next_wallpaper"
             ;;
         "previous")
             generate_wallpaper_list
-            swww img --transition-type any "$wallpaper_directory"/"$previous_wallpaper"
+            awww img --transition-type any "$wallpaper_directory"/"$previous_wallpaper"
             notify-send "Previous wallpaper" "$previous_wallpaper"
             ;;
         "regenerate")
