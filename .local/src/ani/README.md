@@ -9,6 +9,7 @@
     - `uv sync` # Install dependencies
         - `uv tool install .` # Install ani globally
 - ***References***
+    - ![2026-05-06T02:22:42Z.gif](https://github.com/user-attachments/assets/db8b2053-709c-4a00-bfd6-92c766633268)
     - https://github.com/Yswag/xptv-extensions/blob/main/js/iyftv.js # Source provider
     - https://github.com/fangkuia/XPTV/blob/main/js/duboku.js # Source provider
     - https://github.com/fangkuia/XPTV/blob/main/js/ole.js # Source provider
