@@ -1,0 +1,17 @@
+- #### Use "ani"
+    - `ani`
+- ***Notes***
+    - Minimize
+        - Maintain a barely usable amount of code
+        - AI + history feature = your customize ani
+        - AI + source provider = your customize ani
+        - Based on this version, you can add small features (such as a history function) by requesting AI
+    - `uv sync` # Install dependencies
+        - `uv tool install .` # Install ani globally
+- ***References***
+    - https://github.com/Yswag/xptv-extensions/blob/main/js/iyftv.js # Source provider
+    - https://github.com/fangkuia/XPTV/blob/main/js/duboku.js # Source provider
+    - https://github.com/fangkuia/XPTV/blob/main/js/ole.js # Source provider
+    - https://github.com/pystardust/ani-cli/blob/master/ani-cli # `/--force-media-title`
+    - Artificial intelligence
+- ---
