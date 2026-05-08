@@ -1,15 +1,22 @@
 - #### Use "ani"
     - `ani`
 - ***Notes***
+    - TODO
+        - During the TV selection stage
+            - the extracted fields should not display the actual URL to improve the user interface
+            - All source fields should be aligned to improve the user interface
+        - Do not display the actual URL of the video during the episode selection stage to improve the user experience
     - Minimize
         - Maintain a barely usable amount of code
-        - AI + history feature = your customize ani
-        - AI + source provider = your customize ani
-        - Based on this version, you can add small features (such as a history function) by requesting AI
+    - Customize
+        - Based on this version, you can add small features by requesting AI
+        - AI + history
+        - AI + source provider
+        - AI + automatically skip the intro and outro
     - `uv sync` # Install dependencies
         - `uv tool install .` # Install ani globally
 - ***References***
-    - ![2026-05-06T21:32:13Z.gif](https://github.com/user-attachments/assets/eaba9e9b-a4b1-4fb6-b6c2-ba8c2d9f8236)
+    - ![2026-05-08T16:58:42Z.gif](https://github.com/user-attachments/assets/546fd52e-9dc7-4ec0-8ea5-f9f66ae9cd19)
     - https://github.com/Yswag/xptv-extensions/blob/main/js/iyftv.js # Source provider
     - https://github.com/fangkuia/XPTV/blob/main/js/duboku.js # Source provider
     - https://github.com/fangkuia/XPTV/blob/main/js/ole.js # Source provider
