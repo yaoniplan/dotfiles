@@ -479,16 +479,25 @@ def get_source_by_name(source_name: str) -> Optional[Source]:
 
 
 def play_with_player(url: str, media_title: str = ""):
+    # main.py 所在目錄
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+
+    # ani/mpv.conf
+    local_mpv_conf = os.path.join(script_dir, "mpv.conf")
+
     player_cmd = os.environ.get("OLE_PLAYER", "mpv").split()
-    final_cmd = player_cmd[:]
+
+    # 有專案設定才載入，沒有就 fallback 到 mpv global config
+    if os.path.isfile(local_mpv_conf):
+        player_cmd.append(f"--include={local_mpv_conf}")
 
     if media_title:
-        final_cmd.append(f"--force-media-title={media_title}")
+        player_cmd.append(f"--force-media-title={media_title}")
 
-    final_cmd.append(url)
+    player_cmd.append(url)
 
     subprocess.Popen(
-        final_cmd,
+        player_cmd,
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL,
         start_new_session=True,

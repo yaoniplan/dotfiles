@@ -1,6 +1,10 @@
 - #### Use "ani"
     - `ani`
 - ***Notes***
+    - `vim ./mpv.conf` # Configure as needed
+      ```
+      # You can add or modify your parameters here.
+      ```
     - TODO
         - During the TV selection stage
             - the extracted fields should not display the actual URL to improve the user interface
@@ -14,7 +18,8 @@
         - AI + source provider
         - AI + automatically skip the intro and outro
     - `uv sync` # Install dependencies
-        - `uv tool install .` # Install ani globally
+        - `uv tool install --editable .` # Install ani globally in development mode
+        - Update by pulling the source code
 - ***References***
     - ![2026-05-08T16:58:42Z.gif](https://github.com/user-attachments/assets/546fd52e-9dc7-4ec0-8ea5-f9f66ae9cd19)
     - https://github.com/Yswag/xptv-extensions/blob/main/js/iyftv.js # Source provider
