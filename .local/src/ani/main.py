@@ -397,36 +397,50 @@ SOURCE_BY_ID = {s.id: s for s in SOURCES}
 
 
 # -------------------- fzf --------------------
-def fzf_select(lines: list[str], prompt: str = "選擇: ") -> Optional[str]:
+def fzf_select(lines: list[str], prompt: str = "選擇: ", expect_keys: str = "alt-a") -> Optional[str]:
+    """expect_keys: comma‑separated list of fzf `--expect` keys (e.g., 'alt-a,alt-s')"""
     if not lines:
         return None
+
     try:
+        cmd = [
+            "fzf",
+            "--prompt",
+            prompt,
+            "--height=40%",
+            "--border",
+            "--delimiter",
+            "\t",
+            "--with-nth",
+            "1,2,3,4",
+        ]
+        # 添加多个期望的按键
+        if expect_keys:
+            cmd.append(f"--expect={expect_keys}")
+        cmd.append("--header=Enter=播放單集 | Alt+A=播放全部 | Alt+S=從此集到結尾")
+
         proc = subprocess.run(
-            [
-                "fzf",
-                "--prompt",
-                prompt,
-                "--height=40%",
-                "--border",
-                "--delimiter",
-                "\t",
-                "--with-nth",
-                "1,2,3,4",
-            ],
+            cmd,
             input="\n".join(lines),
             text=True,
             capture_output=True,
         )
-        if proc.returncode == 0:
-            return proc.stdout.strip()
-        return None
+
+        if proc.returncode != 0:
+            return None
+
+        output = proc.stdout.strip()
+        if not output:
+            return None
+
+        return output
+
     except FileNotFoundError:
         print("❌ 找不到 fzf，請先安裝: sudo pacman -S fzf")
         sys.exit(1)
 
 
 def format_search_line(item: dict) -> str:
-    # source_name \t title \t remark \t play_ref
     return "\t".join(
         [
             item.get("source_name", ""),
@@ -459,13 +473,11 @@ def search_all(keyword: str) -> list[dict]:
             src = future_map[fut]
             try:
                 items = fut.result() or []
-                # 統一補上來源 id/name，方便後面擴充
                 for item in items:
                     item.setdefault("source", src.id)
                     item.setdefault("source_name", src.name)
                 results.extend(items)
             except Exception:
-                # 單一來源炸掉，直接略過
                 continue
 
     return results
@@ -478,23 +490,64 @@ def get_source_by_name(source_name: str) -> Optional[Source]:
     return None
 
 
-def play_with_player(url: str, media_title: str = ""):
-    # main.py 所在目錄
+def build_player_base_cmd() -> list[str]:
     script_dir = os.path.dirname(os.path.abspath(__file__))
-
-    # ani/mpv.conf
     local_mpv_conf = os.path.join(script_dir, "mpv.conf")
 
     player_cmd = os.environ.get("OLE_PLAYER", "mpv").split()
 
-    # 有專案設定才載入，沒有就 fallback 到 mpv global config
     if os.path.isfile(local_mpv_conf):
         player_cmd.append(f"--include={local_mpv_conf}")
+
+    return player_cmd
+
+
+def play_with_player(url: str, media_title: str = ""):
+    player_cmd = build_player_base_cmd()
 
     if media_title:
         player_cmd.append(f"--force-media-title={media_title}")
 
     player_cmd.append(url)
+
+    subprocess.Popen(
+        player_cmd,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+        start_new_session=True,
+    )
+
+
+def play_with_player_playlist(entries: list[dict], start_index: int = 0):
+    """
+    entries: 每个元素包含 url 和 title。
+    start_index: 0‑based，从列表中的第几个条目开始播放（0 = 第一个）
+    """
+    if not entries:
+        print("播放列表為空。")
+        return
+
+    player_cmd = build_player_base_cmd()
+
+    # 如果起始索引大于0，添加 --playlist-start
+    if start_index > 0:
+        player_cmd.append(f"--playlist-start={start_index}")
+
+    for item in entries:
+        url = item["url"]
+        title = item.get("title", "").strip()
+
+        if title:
+            player_cmd.extend(
+                [
+                    "--{",
+                    f"--force-media-title={title}",
+                    url,
+                    "--}",
+                ]
+            )
+        else:
+            player_cmd.append(url)
 
     subprocess.Popen(
         player_cmd,
@@ -512,17 +565,34 @@ def main():
 
     print("搜尋中...")
     results = search_all(keyword)
+
     if not results:
         print("所有來源都沒有找到結果。")
         return
 
     search_lines = [format_search_line(item) for item in results]
-    selected = fzf_select(search_lines, prompt="選擇影片: ")
+
+    selected = fzf_select(
+        search_lines,
+        prompt="選擇影片: ",
+        expect_keys="alt-a,alt-s",  # 在搜索结果阶段也可以加，但这里只用来跳过，实际不影响
+    )
+
     if not selected:
         print("取消選擇。")
         return
 
-    picked = parse_line(selected)
+    # 解析选中的影片信息（fzf 输出可能是 "key\n选中的行"）
+    lines = selected.splitlines()
+    if len(lines) >= 2:
+        # 如果有按键，第一行是键，第二行是选中行
+        # 但我们在这个阶段不需要解析按键，直接取最后一行
+        selected_line = lines[-1]
+    else:
+        selected_line = lines[0]
+
+    picked = parse_line(selected_line)
+
     source_name = picked["source_name"]
     play_ref = picked["play_ref"]
     title = picked["title"]
@@ -534,28 +604,102 @@ def main():
 
     print("取得播放清單...")
     tracks = src.tracks(play_ref)
+
     if not tracks:
         print("這個來源沒有可播放的劇集。")
         return
 
-    track_lines = [f"{t.get('name', '')}\t{t.get('play_ref', '')}" for t in tracks if t.get("name")]
-    selected_ep = fzf_select(track_lines, prompt="選擇劇集: ")
-    if not selected_ep:
+    track_lines = []
+    for t in tracks:
+        name = t.get("name", "")
+        ref = t.get("play_ref", "")
+        if name and ref:
+            track_lines.append(f"{name}\t{ref}")
+
+    # 第二次 fzf：选择剧集，监听 alt-a / alt-s
+    selected_output = fzf_select(
+        track_lines,
+        prompt="選擇劇集: ",
+        expect_keys="alt-a,alt-s",
+    )
+
+    if not selected_output:
         print("取消選擇。")
         return
 
-    ep_name, ep_ref = (selected_ep.split("\t", 1) + [""])[:2]
+    output_lines = selected_output.splitlines()
+    pressed_key = ""
+    selected_ep_line = ""
+
+    if len(output_lines) >= 2:
+        pressed_key = output_lines[0].strip()
+        selected_ep_line = output_lines[1].strip()
+    elif len(output_lines) == 1:
+        selected_ep_line = output_lines[0].strip()
+
+    if not selected_ep_line:
+        print("取消選擇。")
+        return
+
+    ep_name, ep_ref = (selected_ep_line.split("\t", 1) + [""])[:2]
     if not ep_ref:
         print("劇集資料無效。")
         return
 
-    print("解析播放地址...")
-    play_url = src.resolve_play(ep_ref)
-    if not play_url:
-        print("無法取得播放地址。")
+    # 找到当前剧集在 tracks 列表中的索引（用于 Alt+S）
+    try:
+        current_idx = next(i for i, t in enumerate(tracks) if t.get("play_ref") == ep_ref)
+    except StopIteration:
+        current_idx = 0
+
+    # --- 处理三种播放模式 ---
+    if pressed_key == "alt-a":
+        # 播放全部（所有集）
+        entries_to_play = tracks
+        start_idx = 0
+    elif pressed_key == "alt-s":
+        # 从当前集到结尾
+        entries_to_play = tracks[current_idx:]
+        start_idx = 0  # 因为列表已经是从该集开始，所以从0开始播放
+    else:
+        # 单集 (Enter)
+        print("解析播放地址...")
+        play_url = src.resolve_play(ep_ref)
+        if not play_url:
+            print("無法取得播放地址。")
+            return
+
+        media_title = f"[{src.name}] {title} / {ep_name}"
+        print(f"▶ 正在播放: {media_title}")
+        play_with_player(play_url, media_title=media_title)
+        print("播放器已啟動。")
         return
 
-    media_title = f"[{src.name}] {title} / {ep_name}"
-    print(f"▶ 正在播放: {media_title}")
-    play_with_player(play_url, media_title=media_title)
+    # 批量解析播放地址（用于 alt-a 或 alt-s 模式）
+    print("解析播放地址...")
+    playlist = []
+    for t in entries_to_play:
+        ep_name = t.get("name", "")
+        ep_ref = t.get("play_ref", "")
+        if not ep_ref:
+            continue
+        play_url = src.resolve_play(ep_ref)
+        if play_url:
+            media_title = f"[{src.name}] {title} / {ep_name}"
+            playlist.append({"url": play_url, "title": media_title})
+
+    if not playlist:
+        print("沒有可播放劇集。")
+        return
+
+    if pressed_key == "alt-s":
+        print(f"▶ 從第{current_idx+1}集播到結尾（共{len(playlist)}集）")
+    else:
+        print(f"▶ 播放全部（{len(playlist)}集）")
+
+    play_with_player_playlist(playlist, start_index=start_idx)
     print("播放器已啟動。")
+
+
+if __name__ == "__main__":
+    main()
