@@ -1,0 +1,3 @@
+- rules
+  - filename
+    - target (scope) + action (feature) + .user.js (all lowercase kebab-case)
