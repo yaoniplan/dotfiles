@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Reddit & Imgur Redirector
 // @namespace    https://github.com/yaoniplan/dotfiles/.local/src/userscript
-// @version      1.0.0
+// @version      1.0.1
 // @description  Redirect Reddit to Redlib, Imgur to Rimgo.
 // @match        *://www.reddit.com/*
 // @match        *://imgur.com/*
@@ -12,7 +12,7 @@
 // @grant        GM_xmlhttpRequest
 // @connect      raw.githubusercontent.com
 // ==/UserScript==
- 
+
 (function () {
   // --- CONFIGURATION ---
   const CONFIG = {
@@ -22,24 +22,24 @@
     IMGUR_REPLACEMENT: 'rmgur.com'
   };
   // ---------------------
- 
+
   const { hostname, href } = location;
- 
+
   // 1. Handle Imgur (Direct Redirect)
   if (hostname === 'imgur.com') {
     location.replace(href.replace('imgur.com', CONFIG.IMGUR_REPLACEMENT));
     return;
   }
- 
+
   // 2. Handle Reddit
   if (hostname === 'www.reddit.com') {
-    
+
     // FAST MODE: Direct redirect to your preferred instance
     if (!CONFIG.FETCH_REMOTE_INSTANCES) {
       location.replace(href.replace('www.reddit.com', CONFIG.REDDIT_DEFAULT));
       return;
     }
- 
+
     // DYNAMIC MODE: Pull from GitHub
     GM_xmlhttpRequest({
       method: 'GET',
@@ -48,7 +48,7 @@
         try {
           const data = JSON.parse(response.responseText);
           const instances = data.instances.filter(i => i.url && i.url.startsWith('https://'));
-          
+
           if (instances.length > 0) {
             const random = instances[Math.floor(Math.random() * instances.length)];
             const instanceHost = new URL(random.url).hostname;

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Anime Episode Navigator
 // @namespace    https://github.com/yaoniplan/dotfiles/.local/src/userscript
-// @version      1.0.0
+// @version      1.0.1
 // @description  Press Enter to go to next episode, Shift+Enter to go to previous episode.
 // @match        https://www.yhdm530.com/*
 // @match        https://yhdm6a.com/*
@@ -16,16 +16,16 @@
 // @grant        none
 // @run-at       document-start
 // ==/UserScript==
- 
+
 (function () {
   'use strict';
- 
+
   document.addEventListener('keydown', function(event) {
     if (event.key !== 'Enter') return;
-  
+
     const currentURL = window.location.href;
     const direction = event.shiftKey ? -1 : 1;
-  
+
     // ---------------------------------------------------------
     // Universal pattern:
     // Find the last number in the URL and increase/decrease it.
@@ -40,19 +40,19 @@
     //   /play/xxx/yyy/008/
     // ---------------------------------------------------------
     const match = currentURL.match(/^(.*?)(\d+)((?:\.\w+)?\/?)$/);
-  
+
     if (!match) return;
-  
+
     const prefix = match[1];
     const num    = match[2];
     const suffix = match[3];
-  
+
     const nextNum = String(parseInt(num, 10) + direction)
                       .padStart(num.length, "0");
-  
+
     const nextURL = prefix + nextNum + suffix;
-  
+
     window.location.href = nextURL;
   });
- 
+
 })();
