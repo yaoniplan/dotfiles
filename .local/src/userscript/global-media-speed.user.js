@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Global Media Speed
-// @namespace    https://github.com/yaoniplan/dotfiles/.local/src/userscript
-// @version      1.0.1
+// @namespace    https://github.com/yaoniplan/dotfiles/tree/master/.local/src/userscript
+// @version      1.0.2
 // @description  Set all video/audio playback speed to 2x by default. Developers can edit the SPEED constant below
 // @author       yaoniplan
 // @license      MIT

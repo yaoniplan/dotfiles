@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Reddit & Imgur Redirector
-// @namespace    https://github.com/yaoniplan/dotfiles/.local/src/userscript
-// @version      1.0.1
+// @namespace    https://github.com/yaoniplan/dotfiles/tree/master/.local/src/userscript
+// @version      1.0.2
 // @description  Redirect Reddit to Redlib, Imgur to Rimgo.
 // @match        *://www.reddit.com/*
 // @match        *://imgur.com/*
