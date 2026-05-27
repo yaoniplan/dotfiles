@@ -1,11 +1,11 @@
 // ==UserScript==
 // @name         Anime Episode Navigator
 // @namespace    https://github.com/yaoniplan/dotfiles/tree/master/.local/src/userscript
-// @version      1.0.2
+// @version      1.0.3
 // @description  Press Enter to go to next episode, Shift+Enter to go to previous episode.
 // @match        https://www.yhdm530.com/*
 // @match        https://yhdm6a.com/*
-// @match        *://*.agedm1.com/*
+// @match        https://www.agedm1.com/*
 // @match        https://www.olevod.com/*
 // @match        https://yhdm.one/*
 // @match        https://www.agedm.io/*
