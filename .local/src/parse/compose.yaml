@@ -1,0 +1,7 @@
+services:
+  parse:
+    build: .
+    container_name: parse
+    restart: always
+    ports:
+      - 2005:80
