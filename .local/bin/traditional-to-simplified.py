@@ -2,6 +2,8 @@
 # /// script
 # requires-python = ">=3.13"
 # dependencies = [
+#     # On iOS (a-Shell) environments, use the pure Python version instead:
+#     # pip install opencc-python-reimplemented
 #     "opencc>=1.4.1",
 # ]
 # ///
