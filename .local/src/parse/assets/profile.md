@@ -4,11 +4,6 @@
 The best time to plant a tree was 20 years ago. The second best time is <span style="color: #853EFF; font-weight: bold;">now</span>.
 
 [@Blog](https://note.yaoniplan.eu.org) • [@GitHub](https://github.com/yaoniplan) • [@Email](mailto:yaoniplan@gmail.com)
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/yaoniplan/yaoniplan/output/github-contribution-grid-snake-dark.svg">
-  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/yaoniplan/yaoniplan/output/github-contribution-grid-snake.svg">
-  <img alt="github-snake" src="https://raw.githubusercontent.com/yaoniplan/yaoniplan/output/github-contribution-grid-snake-dark.svg">
-</picture>
 
 ## 💻Projects
 <a href="https://github.com/yaoniplan/note">
