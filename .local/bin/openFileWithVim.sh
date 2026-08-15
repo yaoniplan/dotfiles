@@ -4,6 +4,8 @@
 
 # Define the directory to start with
 directory="/"
+terminal="foot -e"
+editor="vim"
 
 while true; do
     # List all files and directories in the current directory and show them in dmenu
@@ -17,7 +19,7 @@ while true; do
         directory="$directory/$selection"
     else
         # If a file is selected, open it with Vim
-        wayst -e vim "$directory/$selection"
+        "$terminal" "$editor" "$directory/$selection"
         exit 0
     fi
 done
