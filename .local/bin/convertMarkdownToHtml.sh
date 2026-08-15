@@ -62,7 +62,3 @@ convertMarkdownToHtml() {
 
 # Generate index.html file
 convertMarkdownToHtml
-
-if command -v docker &>/dev/null; then
-    source $HOME/.local/bin/runContainer.sh
-fi
