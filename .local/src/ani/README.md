@@ -18,10 +18,6 @@
       ```
       # You can add or modify your parameters here.
       ```
-    - Decoupling
-        - [X] test.py
-        - [X] player.py
-        - selector.py
     - Minimize
         - Maintain a barely usable amount of code
     - Customize
@@ -34,7 +30,7 @@
         - `vim ~/.local/bin/ani` # Add to the executable environment if you don't wnat to use `uv run main.py`
           ```
           #!/usr/bin/env sh
-          exec uv run --directory ~/.local/src/ani main.py "$@"
+          exec uv run --directory ~/.local/src/ani main.py
           ```
         - Update by pulling the source code
 - ***References***

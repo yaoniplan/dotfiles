@@ -9,7 +9,7 @@ def fzf_input(prompt="輸入: "):
     """利用 fzf 作為單行文字輸入框，回傳使用者輸入的字串"""
     try:
         proc = subprocess.run(
-            ["fzf", "--print-query", "--prompt", prompt, "--height", "100%", "--reverse"],
+            ["fzf", "--print-query", "--prompt", prompt, "--height", "~100%", "--reverse"],
             input="",                # 沒有候選清單，只當輸入框
             text=True,
             stdout=subprocess.PIPE,
