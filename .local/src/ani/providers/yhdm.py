@@ -1,9 +1,4 @@
-"""
-ani/providers/yhdm.py
-
-樱花动漫 (yhdm.one) Provider
-基于 yt-dlp extractor 逻辑，支持搜索、剧集列表、播放地址解析（多源优先级）
-"""
+# https://github.com/yaoniplan/dotfiles/blob/master/.config/yt-dlp/plugins/yhdm/yt_dlp_plugins/extractor/yhdm.py
 import re
 import json
 from urllib.parse import urlparse, urljoin
@@ -14,7 +9,7 @@ from bs4 import BeautifulSoup
 
 class Provider:
     name = "yhdm"
-    label = "樱花动漫 (yhdm.one)"
+    #name = "樱花动漫"
 
     BASE_URL = "https://yhdm.one"
     API_URL = "https://yhdm.one/_get_plays/{video_id}/{ep}"
