@@ -8,6 +8,15 @@ local is_speeding = false
 local timer = nil
 local pre_hold_speed = 1.0 -- Variable to store your original speed
 
+local function format_speed(speed)
+    -- Check if speed is effectively an integer (with tolerance for floating point)
+    if math.abs(speed - math.floor(speed)) < 0.000001 then
+        return string.format("%dx", speed)
+    else
+        return string.format("%.1fx", speed)
+    end
+end
+
 local function speed_on()
     is_speeding = true
     -- Capture the speed EXACTLY as it is before we change it
@@ -15,7 +24,7 @@ local function speed_on()
 
     local new_speed = pre_hold_speed + speed_increment
     mp.set_property("speed", new_speed)
-    mp.set_osd_ass(0, 0, "▶▶ " .. new_speed .. "x (+1.0x)")
+    mp.set_osd_ass(0, 0, format_speed(new_speed) .. " ▶▶")
 end
 
 local function speed_off()
