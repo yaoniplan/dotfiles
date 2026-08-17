@@ -2,6 +2,7 @@
 
 import subprocess
 import sys
+import threading
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 
@@ -122,44 +123,51 @@ def fzf_select_movie_stream(provider_names, load_provider, keyword):
             print(f"[{provider.name}] 搜尋錯誤: {e}")
             return []
 
-    with ThreadPoolExecutor(max_workers=len(provider_names)) as pool:
-        futures = [pool.submit(search_one, name) for name in provider_names]
+    def feed_results():
+        nonlocal got_result
+        with ThreadPoolExecutor(max_workers=len(provider_names)) as pool:
+            futures = [pool.submit(search_one, name) for name in provider_names]
 
-        for future in as_completed(futures):
-            cards = future.result()
+            for future in as_completed(futures):
+                cards = future.result()
 
-            for card in cards:
-                got_result = True
-                provider = card["_provider"]
-                title = card.get("vod_name", "未知")
-                remark = card.get("vod_remarks", "")
+                for card in cards:
+                    got_result = True
+                    provider = card["_provider"]
+                    title = card.get("vod_name", "未知")
+                    remark = card.get("vod_remarks", "")
 
-                line = f"[{provider.name}] {title}"
-                if remark:
-                    line += f" | {remark}"
+                    line = f"[{provider.name}] {title}"
+                    if remark:
+                        line += f" | {remark}"
 
-                line_map[line] = card
+                    line_map[line] = card
 
-                if proc.poll() is None:
+                    # 如果 fzf 已經結束，就停止寫入
+                    if proc.poll() is not None:
+                        return
                     try:
                         proc.stdin.write(line + "\n")
                         proc.stdin.flush()
                     except Exception:
-                        break
+                        return
 
-    if proc and proc.poll() is None:
-        try:
-            proc.stdin.close()
-        except Exception:
-            pass
+        if proc and proc.poll() is None:
+            try:
+                proc.stdin.close()
+            except Exception:
+                pass
 
-    if not got_result:
-        if proc:
-            proc.kill()
-        return None
+    # 啟動背景執行緒負責搜尋與寫入
+    feeder = threading.Thread(target=feed_results)
+    feeder.start()
 
+    # 主執行緒直接讀取 fzf 的選擇，使用者一按 Enter 就會返回
     selected = proc.stdout.read().strip()
     proc.wait()
+
+    # 可選：給背景執行緒一點時間清理，但不阻塞
+    # feeder.join(timeout=1)
 
     if not selected:
         return None
