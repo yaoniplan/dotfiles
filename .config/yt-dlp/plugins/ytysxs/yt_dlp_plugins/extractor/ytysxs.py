@@ -13,26 +13,27 @@ class YtysxsIE(InfoExtractor):
             'id': '16694',
             'title': '《苟在武道世界成聖》有聲書小說|東方玄幻小說|在水中的紙老虎著|老寶玉_白玉京播',
         },
-        'playlist_mincount': 148,   # 148 tracks across two playlists
+        'playlist_mincount': 148,
     }]
-
-    _HEADERS = {
-        'Referer': 'https://www.ytysxs.com/',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36',
-    }
 
     def _real_extract(self, url):
         video_id = self._match_id(url)
-        webpage = self._download_webpage(url, video_id, headers=self._HEADERS)
 
-        # Title: prefer Open Graph, then meta description, then ID
+        # Let command-line options (impersonate + cookies) take priority
+        webpage = self._download_webpage(
+            url, video_id,
+            note='Downloading webpage',
+            # Do NOT hardcode headers or impersonate here — let yt-dlp handle it
+        )
+
+        # Title extraction
         title = (
             self._og_search_title(webpage, default=None)
             or self._html_search_meta('description', webpage)
             or video_id
         )
 
-        # Find all AudioIgniter playlist IDs on the page
+        # Find AudioIgniter playlists
         playlist_ids = re.findall(
             r'data-tracks-url="[^"]*audioigniter_playlist_id=(\d+)', webpage
         )
@@ -45,17 +46,14 @@ class YtysxsIE(InfoExtractor):
             try:
                 playlist_data = self._download_json(
                     playlist_url, video_id,
-                    headers=self._HEADERS,
                     note=f'Downloading playlist {pl_id}',
-                    errnote=f'Unable to download playlist {pl_id}',
                 )
             except ExtractorError as e:
                 self.report_warning(f'Skipping playlist {pl_id}: {e}')
                 continue
 
-            # The endpoint returns a list directly – no wrapper object
             if not isinstance(playlist_data, list):
-                self.report_warning(f'Unexpected playlist format for {pl_id}, skipping')
+                self.report_warning(f'Unexpected playlist format for {pl_id}')
                 continue
 
             for track in playlist_data:
@@ -64,7 +62,7 @@ class YtysxsIE(InfoExtractor):
                     continue
 
                 track_title = track.get('title', '')
-                artist = track.get('subtitle', '')  # narrator name
+                artist = track.get('subtitle', '')
 
                 entry = {
                     'id': self._search_regex(r'/([^/]+)\.mp3', audio_url, 'track id', default=audio_url),
