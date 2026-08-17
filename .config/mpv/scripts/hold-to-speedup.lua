@@ -1,3 +1,4 @@
+-- https://github.com/iiiGerardoiii/mpv-hold-to-speedup/blob/main/hold-to-speedup.lua
 -- This script changes playback speed to (current speed + 1) while spacebar/LMB is held for 0.5 seconds
 -- and reverts to the original speed on release. If released earlier, space toggles pause/play.
 
