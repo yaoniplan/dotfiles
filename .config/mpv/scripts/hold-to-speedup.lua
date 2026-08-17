@@ -1,8 +1,7 @@
--- This script changes playback speed to 2x while the spacebar or LMB is held for 0.5 seconds
--- and reverts it to normal speed when the spacebar is released. If released earlier,
--- it toggles pause/play as default behavior.
+-- This script changes playback speed to (current speed + 1) while spacebar/LMB is held for 0.5 seconds
+-- and reverts to the original speed on release. If released earlier, space toggles pause/play.
 
-local speed_multiplier = 2.0
+local speed_increment = 1.0
 local hold_threshold = 0.5
 local is_speeding = false
 local timer = nil
@@ -13,8 +12,9 @@ local function speed_on()
     -- Capture the speed EXACTLY as it is before we change it
     pre_hold_speed = mp.get_property_number("speed")
 
-    mp.set_property("speed", speed_multiplier)
-    mp.set_osd_ass(0, 0, "▶▶ " .. speed_multiplier .. "x faster")
+    local new_speed = pre_hold_speed + speed_increment
+    mp.set_property("speed", new_speed)
+    mp.set_osd_ass(0, 0, "▶▶ " .. new_speed .. "x (+1.0x)")
 end
 
 local function speed_off()
