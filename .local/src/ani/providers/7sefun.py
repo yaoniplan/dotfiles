@@ -2,12 +2,17 @@
 import base64
 import json
 import re
+import warnings
 from urllib.parse import quote, unquote
 
 import requests
 from bs4 import BeautifulSoup
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import unpad
+from urllib3.exceptions import InsecureRequestWarning
+
+# 外部解析站常見過期證書，關閉對應告警
+warnings.filterwarnings("ignore", category=InsecureRequestWarning)
 
 
 class Provider:
@@ -20,19 +25,25 @@ class Provider:
         "Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0"
     )
 
-    # player from → parse url (empty means internal player)
+    # from → parse url (empty = internal player)
     PLAYER_CONFIG = {
         "2bdm": {"show": "七色R线", "parse": ""},
         "lmm": {
             "show": "七色A线",
-            "parse": "https://dp.no3acg.com/player/ec.php?code=qw&if=1&from=lmm&url=",
+            "parse": (
+                "https://dp.no3acg.com/player/ec.php"
+                "?code=qw&if=1&from=lmm&url="
+            ),
         },
         "H265": {"show": "高清H265", "parse": ""},
         "CYDD1": {"show": "七色C线", "parse": ""},
         "ndx": {"show": "七色B线", "parse": ""},
         "funzy": {
             "show": "日漫高清",
-            "parse": "https://nplayer.7sefun.top/player/index.php?code=qw&url=",
+            "parse": (
+                "https://nplayer.7sefun.top/player/"
+                "index.php?code=qw&url="
+            ),
         },
         "funzycn": {"show": "国语高清", "parse": ""},
         "funzy4K": {"show": "4K超清", "parse": ""},
@@ -82,6 +93,8 @@ class Provider:
 
     def __init__(self):
         self.session = requests.Session()
+        # 部分解析域名證書過期，統一關閉校驗
+        self.session.verify = False
         self.session.headers.update(
             {
                 "User-Agent": self.UA,
@@ -90,27 +103,38 @@ class Provider:
             }
         )
 
+    # ------------------------------------------------------------------
+    # public API
+    # ------------------------------------------------------------------
+
     def search(self, keyword):
         cards = []
-        text = quote(keyword)
-        url = f"{self.BASE}/vodsearch/{text}----------1---.html"
+        url = (
+            f"{self.BASE}/vodsearch/"
+            f"{quote(keyword)}----------1---.html"
+        )
         resp = self.session.get(url, timeout=15)
+        resp.raise_for_status()
         soup = BeautifulSoup(resp.text, "html.parser")
-        for el in soup.select("div.video"):
-            a = el.select_one("a.video-wrapper")
+
+        for video in soup.select("div.video"):
+            a = video.select_one("a.video-wrapper")
             if not a:
                 continue
             href = a.get("href", "")
-            img = el.select_one("img.videoimg")
+            if not href:
+                continue
+            img = video.select_one("img.videoimg")
             title = (img.get("alt") if img else "") or ""
             cover = (img.get("src") if img else "") or ""
-            sub = el.select_one(".video-time")
-            remarks = sub.get_text(strip=True) if sub else ""
+            remark_el = video.select_one(".video-time")
+            remark = remark_el.get_text(strip=True) if remark_el else ""
             cards.append(
                 {
                     "vod_id": href,
                     "vod_name": title,
-                    "vod_remarks": remarks,
+                    "vod_pic": cover,
+                    "vod_remarks": remark,
                     "url": self.BASE + href,
                 }
             )
@@ -118,182 +142,235 @@ class Provider:
 
     def get_tracks(self, card):
         """
-        Returns list of {name, url} for every playable episode across all
-        source groups.
+        Flatten all playlists into a single list of episodes.
+        Same episode from later sources is kept as alternate URLs so
+        resolve_play can fall back when the first route fails.
+        Display name stays plain: 第01集
         """
-        tracks = []
+        # ep_name → list of play page urls (one per source)
+        by_name = {}
+        order = []
+
         resp = self.session.get(card["url"], timeout=15)
+        resp.raise_for_status()
         soup = BeautifulSoup(resp.text, "html.parser")
 
-        for container in soup.select(".vod-play-list-container"):
-            for span in container.select("span"):
+        for playlist in soup.select(".vod-play-list-container"):
+            for span in playlist.select("span"):
                 a = span.select_one("a")
                 if not a:
                     continue
                 href = a.get("href", "")
+                if not href:
+                    continue
                 name = a.get_text(strip=True)
-                tracks.append(
-                    {
-                        "name": name,
-                        "url": self.BASE + href,
-                    }
-                )
+                play_url = self.BASE + href
+                if name not in by_name:
+                    by_name[name] = []
+                    order.append(name)
+                by_name[name].append(play_url)
+
+        tracks = []
+        for name in order:
+            urls = by_name[name]
+            tracks.append(
+                {
+                    "name": name,
+                    "url": urls[0],
+                    # extra routes for fallback inside resolve_play
+                    "alt_urls": urls[1:],
+                }
+            )
         return tracks
 
     def resolve_play(self, track):
-        resp = self.session.get(track["url"], timeout=15)
-        html = resp.text
+        urls = [track["url"]] + list(track.get("alt_urls") or [])
+        last_err = None
 
-        # extract player_aaaa config
-        m = re.search(
-            r"var\s+player_aaaa\s*=\s*({.*?})\s*</script>",
-            html,
-            re.S,
+        for play_page in urls:
+            try:
+                return self._resolve_one(play_page)
+            except Exception as e:
+                last_err = e
+                continue
+
+        raise Exception(
+            f"解析失敗: 所有線路均不可用 ({last_err})"
         )
-        if not m:
-            # fallback: script containing player_aaaa
-            soup = BeautifulSoup(html, "html.parser")
-            for script in soup.find_all("script"):
-                txt = script.string or ""
-                if "player_aaaa" in txt:
-                    m = re.search(r"player_aaaa\s*=\s*({.*?})\s*;?\s*$", txt, re.S)
-                    if m:
-                        break
-            if not m:
-                raise Exception("解析失敗: 找不到 player_aaaa")
 
-        config = json.loads(m.group(1))
+    def _resolve_one(self, play_page_url):
+        resp = self.session.get(play_page_url, timeout=15)
+        resp.raise_for_status()
+        config = self._get_player_config(resp.text)
+        if not config:
+            raise Exception("未找到播放器配置")
+
         encrypt = config.get("encrypt", 0)
         video_url = config.get("url", "")
-        from_ = config.get("from", "")
-        link = config.get("link", "")
 
-        if encrypt == 2:
-            # base64 + unescape
-            video_url = unquote(
-                base64.b64decode(video_url).decode("utf-8", errors="ignore")
-            )
-            # extract id from link path
-            id_ = ""
-            if link:
-                parts = link.rstrip("/").split("/")
-                last = parts[-1] if parts else ""
-                id_ = last.split("-")[0] if last else ""
+        # encrypt 0 / 1 or already-plain m3u8
+        if encrypt != 2:
+            if encrypt == 1:
+                video_url = unquote(video_url)
+            if video_url.endswith(".m3u8") or video_url:
+                return video_url
+            raise Exception("未找到播放地址")
 
-            jx_url = ""
-            if from_ in self.PLAYER_CONFIG:
-                jx_url = self.PLAYER_CONFIG[from_].get("parse") or ""
+        # encrypt == 2 → base64 + unescape
+        video_url = self._decode_url(video_url)
+        from_name = config.get("from", "")
+        jx_url = self.PLAYER_CONFIG.get(from_name, {}).get("parse", "")
 
-            if not jx_url:
-                # internal player path
-                index_url = (
-                    f"{self.BASE}/addons/dp/player/index.php"
-                    f"?key=0&id={id_}&uid=0&from={from_}&url={video_url}"
-                )
-                r = self.session.get(index_url, timeout=15)
-                href_m = re.search(r'href="(.+?)";', r.text)
-                if not href_m:
-                    raise Exception("解析失敗: index.php 無 href")
-                player_url = self.BASE + href_m.group(1)
+        if not jx_url:
+            return self._resolve_internal(video_url, from_name, config)
 
-                if "art.php" in player_url:
-                    art = self.session.get(player_url, timeout=15).text
-                    cfg_m = re.search(
-                        r"config\s*=\s*({[\s\S]*?})\s*if\s*\(",
-                        art,
-                    )
-                    if not cfg_m:
-                        raise Exception("解析失敗: art.php 無 config")
-                    # safe-ish eval of the JS object literal
-                    cfg = self._js_obj_to_dict(cfg_m.group(1))
-                    return cfg.get("url", "")
-                else:
-                    # dp.php or other
-                    player_data = self.session.get(player_url, timeout=15).text
-                    cfg_m = re.search(
-                        r"config\s*=\s*(\{[\s\S]*?\})\s*(?:;|if\s*\()",
-                        player_data,
-                    )
-                    if cfg_m:
-                        cfg = self._js_obj_to_dict(cfg_m.group(1))
-                        return cfg.get("url", "")
-                    # fallback direct media url
-                    video_m = re.search(
-                        r'https?://[^\s"\']+\.(?:mp4|m3u8|flv)',
-                        player_data,
-                    )
-                    if video_m:
-                        return video_m.group(0)
-                    raise Exception("解析失敗: 無法從 player 頁提取播放地址")
+        if "ec.php" in jx_url:
+            try:
+                return self._resolve_ec(jx_url + video_url)
+            except Exception:
+                # external AES path failed → try site internal player
+                return self._resolve_internal(video_url, from_name, config)
 
-            elif "ec.php" in jx_url:
-                jx_data = self.session.get(jx_url + video_url, timeout=15).text
-                cfg_m = re.search(
-                    r"ConFig\s*=\s*({[\s\S]*?})\s*,\s*box",
-                    jx_data,
-                )
-                if not cfg_m:
-                    raise Exception("解析失敗: ec.php 無 ConFig")
-                ConFig = self._js_obj_to_dict(cfg_m.group(1))
-                enc_url = ConFig.get("url", "")
-                uid = (ConFig.get("config") or {}).get("uid", "")
-                return self._aes_decrypt(enc_url, uid)
-
-            else:
-                # other external parse urls – just append and hope for m3u8/mp4
-                # (most of these return a player page; caller may need extra work)
-                return jx_url + video_url
-
-        # plain m3u8
-        if video_url.endswith(".m3u8"):
-            return video_url
-
-        # encrypt 0/1 fallbacks
-        if encrypt == 1:
-            return unquote(video_url)
-        return video_url
+        # other external parsers
+        try:
+            return jx_url + video_url
+        except Exception:
+            return self._resolve_internal(video_url, from_name, config)
 
     # ------------------------------------------------------------------
     # helpers
     # ------------------------------------------------------------------
+
     @staticmethod
-    def _aes_decrypt(ciphertext_b64: str, uid: str) -> str:
+    def _get_player_config(html):
+        """Extract player_* JSON object (player_aaaa, player_xxxx, …)."""
+        match = re.search(
+            r"var\s+player_[A-Za-z0-9_]*\s*=\s*(\{.*?\})\s*</script>",
+            html,
+            re.S,
+        )
+        if not match:
+            match = re.search(
+                r"var\s+player_[A-Za-z0-9_]*\s*=\s*(\{[\s\S]*?\})",
+                html,
+            )
+        if not match:
+            return None
+        try:
+            return json.loads(match.group(1))
+        except json.JSONDecodeError:
+            return None
+
+    @staticmethod
+    def _decode_url(value):
+        """Equivalent to JS: unescape(base64Decode(config.url))."""
+        decoded = base64.b64decode(value).decode("utf-8", errors="ignore")
+        return unquote(decoded)
+
+    def _resolve_internal(self, video_url, from_name, config):
+        """Handle empty-parse sources via site's own dp player."""
+        link = config.get("link", "")
+        video_id = link.rsplit("/", 1)[-1].split("-", 1)[0] if link else ""
+
+        index_url = (
+            f"{self.BASE}/addons/dp/player/index.php"
+            f"?key=0&id={video_id}"
+            f"&uid=0"
+            f"&from={from_name}"
+            f"&url={quote(video_url, safe='')}"
+        )
+        resp = self.session.get(index_url, timeout=15)
+        resp.raise_for_status()
+
+        match = re.search(r'href="([^"]+)";', resp.text)
+        if not match:
+            raise Exception("index.php 無 href")
+        player_url = self.BASE + match.group(1)
+
+        resp = self.session.get(player_url, timeout=15)
+        resp.raise_for_status()
+        player_html = resp.text
+
+        cfg = self._extract_config(player_html)
+        if cfg and cfg.get("url"):
+            return cfg["url"]
+
+        match = re.search(
+            r'https?://[^\s"\']+\.(?:mp4|m3u8|flv)',
+            player_html,
+            re.I,
+        )
+        if match:
+            return match.group(0)
+
+        raise Exception("無法從 player 頁提取播放地址")
+
+    def _resolve_ec(self, url):
+        """lmm / ec.php AES path."""
+        resp = self.session.get(url, timeout=15)
+        resp.raise_for_status()
+
+        match = re.search(
+            r"ConFig\s*=\s*(\{[\s\S]*?\})\s*,\s*box",
+            resp.text,
+        )
+        if not match:
+            raise Exception("ec.php 無 ConFig")
+
+        cfg = self._js_obj_to_dict(match.group(1))
+        enc_url = cfg.get("url", "")
+        uid = (cfg.get("config") or {}).get("uid", "")
+        if not enc_url:
+            raise Exception("ConFig 無 url")
+        return self._decrypt_ec(enc_url, uid)
+
+    @staticmethod
+    def _decrypt_ec(data, uid):
         """
-        AES-CBC decrypt used by the lmm / ec.php player.
-        Key:  Utf8("2890" + uid + "tB959C")
-        IV:   Utf8("2F131BE91247866E")
+        AES-CBC-PKCS7
+        key = UTF8('2890' + uid + 'tB959C')
+        iv  = UTF8('2F131BE91247866E')
         """
-        key = ("2890" + str(uid) + "tB959C").encode("utf-8")
+        key = f"2890{uid}tB959C".encode("utf-8")
         iv = b"2F131BE91247866E"
+        encrypted = base64.b64decode(data)
         cipher = AES.new(key, AES.MODE_CBC, iv)
-        raw = base64.b64decode(ciphertext_b64)
-        decrypted = unpad(cipher.decrypt(raw), AES.block_size)
+        decrypted = unpad(cipher.decrypt(encrypted), AES.block_size)
         return decrypted.decode("utf-8", errors="ignore")
 
     @staticmethod
-    def _js_obj_to_dict(js_obj: str) -> dict:
+    def _extract_config(html):
+        """Pull a JS `config = {...}` object from player pages."""
+        match = re.search(
+            r"config\s*=\s*(\{[\s\S]*?\})\s*(?:;|if\s*\()",
+            html,
+        )
+        if not match:
+            match = re.search(r"config\s*=\s*(\{[\s\S]*?\})", html)
+        if not match:
+            return None
+        return Provider._js_obj_to_dict(match.group(1))
+
+    @staticmethod
+    def _js_obj_to_dict(raw):
         """
-        Very lightweight conversion of a simple JS object literal to Python dict.
-        Handles the common cases seen on this site (quoted/unquoted keys, nested
-        objects, strings, numbers). Falls back to json.loads after light cleanup.
+        Convert a simple JS object literal to a Python dict.
+        Tries strict JSON first, then light cleanup for unquoted keys /
+        single quotes / trailing commas.
         """
-        # try direct json first (already valid)
         try:
-            return json.loads(js_obj)
-        except Exception:
+            return json.loads(raw)
+        except json.JSONDecodeError:
             pass
 
-        # replace unquoted keys:  key: → "key":
         s = re.sub(
-            r"([{,]\s*)([A-Za-z_][A-Za-z0-9_]*)\s*:",
+            r"([{,]\s*)([A-Za-z_$][\w$]*)\s*:",
             r'\1"\2":',
-            js_obj,
+            raw,
         )
-        # single quotes → double
         s = s.replace("'", '"')
-        # trailing commas
         s = re.sub(r",\s*([}\]])", r"\1", s)
         try:
             return json.loads(s)
-        except Exception as e:
+        except json.JSONDecodeError as e:
             raise Exception(f"無法解析 JS config: {e}") from e
