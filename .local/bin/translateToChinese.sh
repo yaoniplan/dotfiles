@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-# Dependencies: fuzzel , trans, wl-clipboard, notify-send
+# This trans project is no longer maintained, and Google Search no longer works.
+# Dependencies: fuzzel, trans, wl-clipboard, notify-send
 
 # Check if the display server protocol is Wayland
 if [[ "$XDG_SESSION_TYPE" = "wayland" ]]; then
