@@ -8,13 +8,18 @@ SERVER_URL="http://100.65.173.16:2004/diary"
 # Set the default tag
 tag=""
 
-# Prompt user to input the content interactively using dmenu
-memo=$(echo "" | tofi)
+# Check if the parameters is empty
+if [[ "$#" -ne 0 ]]; then
+    memo="$@"
+else
+    # Prompt user to input the content interactively using dmenu
+    memo=$(echo "" | tofi)
 
-# Check if memo is empty
-if [[ -z "$memo" ]]; then
-    echo "Memo is empty. Aborting."
-    exit 1
+    # Check if memo is empty
+    if [[ -z "$memo" ]]; then
+        echo "Memo is empty. Aborting."
+        exit 1
+    fi
 fi
 
 # Read the content of the Markdown file and escape special characters
