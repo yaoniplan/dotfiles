@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 
-# Dependencies: tofi, trans, wl-clipboard, notify-send
+# Dependencies: fuzzel , trans, wl-clipboard, notify-send
 
 # Check if the display server protocol is Wayland
 if [[ "$XDG_SESSION_TYPE" = "wayland" ]]; then
     # Prompt user to input
-    input="$(echo "" | tofi)"
+    input="$(echo "" | fuzzel --dmenu)"
 
     # Check if input is empty
     if [[ -z "$input" ]]; then
@@ -14,11 +14,11 @@ if [[ "$XDG_SESSION_TYPE" = "wayland" ]]; then
     fi
 
     # Interact with user to select translation option
-    selectedOption=$(echo -e "toEnglish\ntoChinese" | tofi)
+    selectedOption=$(echo -e "toEnglish\ntoChinese" | fuzzel --dmenu)
 
     case "$selectedOption" in
         "toEnglish")
-            translationOption="-no-ansi -play"
+            translationOption="-no-ansi -play -player mpg123"
             sourceLanguage="zh"
             targetLanguage="en"
             ;;
@@ -40,8 +40,13 @@ if [[ "$XDG_SESSION_TYPE" = "wayland" ]]; then
     firstParagraph=$(echo -e "$translation" | awk -v RS='' 'NR==1')
     secondParagraph=$(echo -e "$translation" | awk -v RS='' 'NR==2')
 
-    # Copy Chinese translation to clipboard
-    echo "$firstParagraph" | wl-copy
+    if [[ "$selectedOption" == "toEnglish" ]]; then
+        # Copy English translation to clipboard
+        echo "$secondParagraph" | wl-copy
+    else
+        # Copy Chinese translation to clipboard
+        echo "$firstParagraph" | wl-copy
+    fi
 
     # Send a notification
     notify-send "$firstParagraph" "$secondParagraph"
