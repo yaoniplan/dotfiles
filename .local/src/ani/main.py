@@ -15,7 +15,7 @@ PROVIDERS = [
     "7sefun",
     "yhdm",
     "iyf",
-    #"myself",
+    "myself",
     #"i275",
 ]
 
