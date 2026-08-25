@@ -78,7 +78,7 @@ def main():
         json.dump(state, f, ensure_ascii=False, indent=2)
 
     # 输出两行：播放地址 + 标题
-    title = f"[{source}] {state['title']} / {track['name']}"
+    title = f"[{source}] {state['title']} - {track['name']}"
     print(play_url)
     print(title)
 

@@ -50,7 +50,7 @@ def play_single(
     player_cmd.append(f"--playlist={playlist_path}")
     player_cmd.append(f"--playlist-start={start_index}")
     current_ep = tracks[start_index]["name"]
-    media_title = f"[{source_name}] {anime_title} / {current_ep}"
+    media_title = f"[{source_name}] {anime_title} - {current_ep}"
     player_cmd.append(f"--force-media-title={media_title}")
 
     print(f"▶ 正在播放: {media_title}")
