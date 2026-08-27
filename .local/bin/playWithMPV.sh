@@ -2,8 +2,10 @@
 
 # Dependencies: mpv, yt-dlp, streamlink, xsel (or wl-clipboard)
 
-# Grab URL from clipboard
-if [[ "$XDG_SESSION_TYPE" = "wayland" ]]; then
+# Grab URL from command-line argument first, then fall back to clipboard
+if [[ -n "$1" ]]; then
+    URL="$@"
+elif [[ "$XDG_SESSION_TYPE" = "wayland" ]]; then
     URL=$(wl-paste)
 else
     URL=$(xsel --output --clipboard)
@@ -25,5 +27,5 @@ elif [[ "$URL" =~ \.html($|\?) ]]; then
     streamlink --hls-start-offset 5s --stream-segment-threads 3 --player-no-close --player mpv --player-args '--hwdec=auto --hwdec-codecs=all' "$realUrl" best
 else
     # Normal URL — just play with mpv
-    mpv --mute=yes --hwdec=auto --hwdec-codecs=all --ytdl-format='bv*[vcodec^=avc1][height<=720]+ba/b' --ytdl-raw-options=cookies=~/.config/yt-dlp/cookies.txt "$URL"
+    sh -c "mpv --mute=yes --hwdec=auto --hwdec-codecs=all --ytdl-format='bv*[vcodec^=avc1][height<=720]+ba/b' --ytdl-raw-options=cookies=~/.config/yt-dlp/cookies.txt $URL"
 fi
