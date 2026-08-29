@@ -12,7 +12,7 @@ from selector import fzf_input, fzf_select, fzf_select_movie_stream
 PROVIDERS = [
     "duboku",
     "ole",
-    "7sefun",
+    #"vod",
     "yhdm",
     "iyf",
     "myself",

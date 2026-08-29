@@ -1,4 +1,6 @@
 # https://github.com/Yswag/xptv-extensions/blob/main/js/7sefun.js
+# Because the site owner updates the encryption method too frequently.
+
 import base64
 import json
 import re
