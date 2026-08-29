@@ -96,7 +96,7 @@ def fzf_select_movie_stream(provider_names, load_provider, keyword):
 
     try:
         proc = subprocess.Popen(
-            ["fzf", "--prompt", "選擇影片: ", "--height", "100%", "--reverse"],
+            ["fzf", "--prompt", "選擇影片: ", "--height", "100%", "--reverse", "--no-sort"],
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             text=True,
