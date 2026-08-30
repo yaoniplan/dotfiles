@@ -21,14 +21,52 @@ def filename_to_url(filename: str) -> str:
     encoded = filename[len("config."):-len(".json")]
     return urllib.parse.unquote(encoded)
 
-def switch_config(file_path: Path):
-    """Switch active config to file_path and restart sing-box."""
+def switch_config(file_path: Path) -> bool:
+    """Switch the active config; roll back the symlink if restart fails or the user interrupts"""
     symlink = CONFIG_DIR / "config.json"
-    if symlink.exists() or symlink.is_symlink():
-        symlink.unlink()
-    symlink.symlink_to(file_path)
-    subprocess.run(["doas", "systemctl", "restart", "sing-box"], check=True)
-    print(f"Switched to {file_path.name}")
+
+    # Record the current symlink target (if it exists)
+    previous_target = None
+    if symlink.is_symlink():
+        try:
+            previous_target = os.readlink(symlink)
+        except OSError:
+            pass
+
+    # Update the symlink
+    try:
+        if symlink.exists() or symlink.is_symlink():
+            symlink.unlink()
+        symlink.symlink_to(file_path)
+    except OSError as e:
+        print(f"Unable to update symlink: {e}", file=sys.stderr)
+        return False
+
+    # Try to restart sing-box
+    try:
+        subprocess.run(["doas", "systemctl", "restart", "sing-box"], check=True)
+        print(f"Switched to {file_path.name}")
+        return True
+    except subprocess.CalledProcessError as e:
+        print(f"Restart failed (exit code {e.returncode}), rolling back config", file=sys.stderr)
+    except KeyboardInterrupt:
+        # User pressed Ctrl-C
+        print("\nOperation interrupted, rolling back config", file=sys.stderr)
+    except Exception as e:
+        print(f"Unknown error during restart: {e}, rolling back config", file=sys.stderr)
+
+    # Roll back the symlink
+    try:
+        if symlink.exists() or symlink.is_symlink():
+            symlink.unlink()
+        if previous_target:
+            symlink.symlink_to(previous_target)
+            print(f"Rolled back to previous config", file=sys.stderr)
+        else:
+            print(f"No previous config, symlink removed", file=sys.stderr)
+    except OSError as e:
+        print(f"Failed to roll back symlink: {e}", file=sys.stderr)
+    return False
 
 def create_config(url: str):
     """Download new subscription config and switch to it."""
@@ -43,7 +81,6 @@ def create_config(url: str):
         ["curl", "-LsG", "--data-urlencode", f"sub={url}", SUB_API],
         capture_output=True, text=True
     )
-
     if result.returncode != 0:
         print("Invalid configuration", file=sys.stderr)
         return
@@ -54,8 +91,10 @@ def create_config(url: str):
             input=result.stdout, text=True, stdout=f, check=True
         )
 
-    switch_config(file_path)
-    print(f"Downloaded and switched to {file_path.name}")
+    if switch_config(file_path):
+        print(f"Downloaded and switched to {file_path.name}")
+    else:
+        print(f"File saved, but switch failed: {file_path.name}")
 
 def update_config(file_path: Path):
     """Re‑download a config from its extracted URL."""
@@ -69,7 +108,6 @@ def update_config(file_path: Path):
         ["curl", "-LsG", "--data-urlencode", f"sub={url}", SUB_API],
         capture_output=True, text=True
     )
-
     if result.returncode != 0:
         if tmp_path.exists():
             tmp_path.unlink()
@@ -82,9 +120,11 @@ def update_config(file_path: Path):
             input=result.stdout, text=True, stdout=f, check=True
         )
 
-    tmp_path.replace(file_path)   # atomic replace
-    switch_config(file_path)
-    print(f"Updated and switched to {file_path.name}")
+    tmp_path.replace(file_path)
+    if switch_config(file_path):
+        print(f"Updated and switched to {file_path.name}")
+    else:
+        print(f"File updated, but switch failed: {file_path.name}")
 
 def delete_config(file_path: Path, configs: list[str]):
     """Delete config. If it's the active one, fallback to neighbor or remove symlink."""
@@ -105,25 +145,28 @@ def delete_config(file_path: Path, configs: list[str]):
         except OSError:
             pass
 
+    if is_current:
+        idx = configs.index(basename) if basename in configs else -1
+        fallback = None
+        if idx > 0:
+            fallback = CONFIGS_SUBDIR / configs[idx - 1]
+        elif idx < len(configs) - 1:
+            fallback = CONFIGS_SUBDIR / configs[idx + 1]
+
+        if fallback:
+            if not switch_config(fallback):
+                print("Failed to switch to fallback config, cancelling deletion", file=sys.stderr)
+                return
+        else:
+            try:
+                symlink.unlink()
+                print("No other config available, symlink removed")
+            except OSError as e:
+                print(f"Failed to remove symlink: {e}", file=sys.stderr)
+                return
+
     file_path.unlink()
     print(f"Deleted {basename}")
-
-    if not is_current:
-        return
-
-    idx = configs.index(basename) if basename in configs else -1
-    fallback = None
-    if idx > 0:
-        fallback = CONFIGS_SUBDIR / configs[idx - 1]
-    elif idx < len(configs) - 1:
-        fallback = CONFIGS_SUBDIR / configs[idx + 1]
-
-    if fallback:
-        switch_config(fallback)
-        print(f"Switched to fallback: {fallback.name}")
-    else:
-        symlink.unlink()
-        print("No remaining configuration; config.json removed")
 
 def edit_config(file_path: Path):
     """Open config in editor."""
