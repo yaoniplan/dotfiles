@@ -1,4 +1,6 @@
 # https://github.com/yaoniplan/dotfiles/blob/master/.config/yt-dlp/plugins/yhdm/yt_dlp_plugins/extractor/yhdm.py
+# Not recommended for streaming (Because it has ads)
+# Only use it to check the release year (Because the search is super fast)
 import re
 import json
 from urllib.parse import urlparse, urljoin
