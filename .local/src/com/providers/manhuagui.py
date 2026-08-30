@@ -1,14 +1,111 @@
 # https://github.com/keiyoushi/extensions-source/blob/main/src/zh/manhuagui/src/eu/kanade/tachiyomi/extension/zh/manhuagui/Manhuagui.kt
+"""
+No lzstring dependency — pure-Python decompressFromBase64.
+"""
 from __future__ import annotations
 
 import json
 import re
 from urllib.parse import urljoin
 
-import lzstring
 import requests
 from bs4 import BeautifulSoup
 
+# ---------------------------------------------------------------------------
+# Minimal LZ-String (decompressFromBase64 only)
+# ---------------------------------------------------------------------------
+
+_KEY_STR_BASE64 = (
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/="
+)
+
+
+def decompress_from_base64(input_str: str) -> str | None:
+    """Pure-Python port of LZString.decompressFromBase64."""
+    if not input_str:
+        return ""
+
+    def get_base_value(alphabet: str, character: str) -> int:
+        return alphabet.index(character)
+
+    length = len(input_str)
+    reset_value = 32
+    dictionary: dict[int, str] = {i: chr(i) for i in range(3)}
+    enlarge_in = 4
+    dict_size = 4
+    num_bits = 3
+    data_val = get_base_value(_KEY_STR_BASE64, input_str[0])
+    data_position = reset_value
+    data_index = 1
+
+    def read_bits(n: int) -> int:
+        nonlocal data_val, data_position, data_index
+        bits = 0
+        for i in range(n):
+            resb = data_val & data_position
+            data_position >>= 1
+            if data_position == 0:
+                data_position = reset_value
+                data_val = get_base_value(_KEY_STR_BASE64, input_str[data_index])
+                data_index += 1
+            bits |= (1 if resb > 0 else 0) << i
+        return bits
+
+    # first symbol
+    bits = read_bits(2)
+    if bits == 0:
+        c = chr(read_bits(8))
+    elif bits == 1:
+        c = chr(read_bits(16))
+    else:
+        return ""
+
+    dictionary[3] = c
+    w = c
+    result = [c]
+
+    while data_index <= length:
+        bits = read_bits(num_bits)
+        if bits == 0:
+            dictionary[dict_size] = chr(read_bits(8))
+            bits = dict_size
+            dict_size += 1
+            enlarge_in -= 1
+        elif bits == 1:
+            dictionary[dict_size] = chr(read_bits(16))
+            bits = dict_size
+            dict_size += 1
+            enlarge_in -= 1
+        elif bits == 2:
+            return "".join(result)
+
+        if enlarge_in == 0:
+            enlarge_in = 2**num_bits
+            num_bits += 1
+
+        if bits in dictionary:
+            entry = dictionary[bits]
+        elif bits == dict_size:
+            entry = w + w[0]
+        else:
+            return None
+
+        result.append(entry)
+        dictionary[dict_size] = w + entry[0]
+        dict_size += 1
+        enlarge_in -= 1
+        w = entry
+
+        if enlarge_in == 0:
+            enlarge_in = 2**num_bits
+            num_bits += 1
+
+    return "".join(result)
+
+
+# ---------------------------------------------------------------------------
+# Packer unpack
+# ---------------------------------------------------------------------------
 
 def _convert_base(value: int, base: int) -> str:
     digits = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -40,6 +137,10 @@ def _unpack_packed_js(function_frame: str, a: int, c: int, data: list[str]) -> d
         raise ValueError("Failed to extract JSON from unpacked chapter script")
     return json.loads(match.group(1))
 
+
+# ---------------------------------------------------------------------------
+# Provider
+# ---------------------------------------------------------------------------
 
 class Provider:
     name = "manhuagui"
@@ -233,7 +334,6 @@ class Provider:
             self._get(f"{self.base_url}/comic/{comic_id}/").text, "html.parser"
         )
 
-        # R18 chapters may be LZString-compressed in __VIEWSTATE
         hidden = soup.select_one("#__VIEWSTATE")
         if hidden is not None:
             if not self.show_r18:
@@ -242,7 +342,7 @@ class Provider:
                 )
             raw = hidden.get("value") or ""
             if raw:
-                decoded = lzstring.LZString().decompressFromBase64(raw)
+                decoded = decompress_from_base64(raw)
                 if decoded:
                     hidden_soup = BeautifulSoup(decoded, "html.parser")
                     err = soup.select_one("#erroraudit_show")
@@ -253,7 +353,6 @@ class Provider:
                     hidden.decompose()
 
         chapters: list[dict] = []
-        # Each section lists newest-first → reverse within ul for oldest→newest
         for section in soup.select("[id^=chapter-list-]"):
             for ul in section.select("ul"):
                 links = list(ul.select("li > a.status0, li > a"))
@@ -323,7 +422,10 @@ class Provider:
         function_frame = m.group(1)
         a = int(m.group(2))
         c = int(m.group(3))
-        data = lzstring.LZString().decompressFromBase64(m.group(4)).split("|")
+        decoded = decompress_from_base64(m.group(4))
+        if decoded is None:
+            raise ValueError("LZString decompress failed")
+        data = decoded.split("|")
         image_json = _unpack_packed_js(function_frame, a, c, data)
 
         path = image_json.get("path") or ""
