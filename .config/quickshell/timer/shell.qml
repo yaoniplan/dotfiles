@@ -462,8 +462,7 @@ ShellRoot {
                 root.remaining = 0
                 root.done = true
 
-                // Play alarm sound once and send notification.
-                alarmProc.running = true
+                // Send notification only.
                 notificationProc.running = true
 
                 return
@@ -471,44 +470,6 @@ ShellRoot {
 
             compactRing.requestPaint()
         }
-    }
-
-
-    // ============================================================
-    // ALARM LOOP
-    // ============================================================
-
-    Timer {
-        id: alarmLoop
-
-        interval: 2000
-        repeat: true
-        running: false
-
-        onTriggered: {
-            alarmProc.running = false
-            alarmProc.running = true
-        }
-    }
-
-    function stopAlarm() {
-        alarmLoop.stop()
-        alarmProc.running = false
-    }
-
-
-    // ============================================================
-    // ALARM SOUND
-    // ============================================================
-
-    Process {
-        id: alarmProc
-
-        running: false
-
-        command: ["paplay", "/usr/share/sounds/freedesktop/stereo/alarm-clock-elapsed.oga"]
-
-        onExited: Qt.quit()
     }
 
 
@@ -522,6 +483,8 @@ ShellRoot {
         running: false
 
         command: ["notify-send", "-i", "clock", "Clock", "Timer"]
+
+        onExited: Qt.quit()
     }
 
 
