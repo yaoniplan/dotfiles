@@ -1,0 +1,63 @@
+#!/bin/bash
+# https://github.com/yaoniplan/dotfiles/tree/master/.config/quickshell/timer
+
+set -e
+
+[ -z "$1" ] && {
+    echo "Usage: timer <time>  (e.g. 30m, 30s, 1h30m, 90)"
+    exit 1
+}
+
+parse_duration() {
+    local s="$1"
+    local total=0
+    local num=""
+    local i c
+
+    for ((i=0; i<${#s}; i++)); do
+        c="${s:$i:1}"
+
+        case "$c" in
+            [0-9])
+                num+="$c"
+                ;;
+            h)
+                total=$((total + num * 3600))
+                num=""
+                ;;
+            m)
+                total=$((total + num * 60))
+                num=""
+                ;;
+            s)
+                total=$((total + num))
+                num=""
+                ;;
+            *)
+                echo "Invalid duration: $s" >&2
+                exit 1
+                ;;
+        esac
+    done
+
+    [ -n "$num" ] &&
+        total=$((total + num))
+
+    echo "$total"
+}
+
+SECS=$(parse_duration "$1")
+
+[ "$SECS" -le 0 ] && {
+    echo "Invalid duration: $1" >&2
+    exit 1
+}
+
+export TIMER_SECONDS="$SECS"
+export TIMER_LABEL="$1"
+
+export QT_QUICK_BACKEND=software
+export QSG_RHI_BACKEND=vulkan
+
+exec quickshell \
+    -p "$HOME/.config/quickshell/timer"
