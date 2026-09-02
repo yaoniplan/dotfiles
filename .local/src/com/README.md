@@ -24,6 +24,7 @@
         - Seamless loading
         - Focus on comic itself (I don't want to be interrupted by irrelevant content)
 - ***References***
+    - ![2026-09-02T21:22:26Z.gif](https://github.com/user-attachments/assets/1114524b-489f-4f4e-9f4f-5e41e3a927fd)
     - https://github.com/keiyoushi/extensions-source/blob/16df97717c304c3f1e309c81acdceaeab5b51314/src/zh/guazimanhua/src/eu/kanade/tachiyomi/extension/zh/guazimanhua/Guazimanhua.kt # Source provider
     - https://github.com/keiyoushi/extensions-source/blob/16df97717c304c3f1e309c81acdceaeab5b51314/src/zh/manwa/src/eu/kanade/tachiyomi/extension/zh/manwa/Manwa.kt # Source provider
     - https://github.com/skepsun/kototoro-parsers/blob/94e3ee1beba2c0fc77c1ec19899e3fbf0c6e4c53/src/main/kotlin/org/skepsun/kototoro/parsers/site/zh/CopyMangaParser.kt # Source provider
