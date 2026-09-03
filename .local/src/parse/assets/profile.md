@@ -1,4 +1,4 @@
-# Hello, I'm <span style="background: linear-gradient(90deg, #8e44ad, #3498db); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Max Hu</span>
+# Hello, I'm <span style="background-image: linear-gradient(120deg, rgb(156, 132, 255), rgb(255, 138, 210) 60%, #ffb37c 100%); background-clip: text; -webkit-background-clip: text; color: transparent; -webkit-text-fill-color: transparent; font-weight: 800;">Max Hu</span>
 
 👦<span style="color: #853EFF; font-weight: bold;">Full Stack</span> Developer / <span style="color: #853EFF; font-weight: bold"><code>Master</code></span>'s student\
 The best time to plant a tree was 20 years ago. The second best time is <span style="color: #853EFF; font-weight: bold;">now</span>.
