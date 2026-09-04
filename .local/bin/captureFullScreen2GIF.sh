@@ -1,17 +1,20 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-if [[ "$XDG_SESSION_TYPE" = "wayland" ]]; then
-    # Set variables
-    fileName=$(date +%Y-%m-%dT%H:%M:%SZ).gif
+if [[ -n "$WAYLAND_DISPLAY" ]]; then
+    # Wayland recording with wf-recorder
+    getPIDOfRecorderProcess=$(pgrep -x wf-recorder)
 
-    if ps aux | grep -v grep | grep wf-recorder &>/dev/null; then
-        pkill wf-recorder
+    if [[ -n "$getPIDOfRecorderProcess" ]]; then
+        # Stop recording
+        kill -INT "$getPIDOfRecorderProcess"
+        sleep 1  # Allow wf-recorder to finalize
+        canberra-gtk-play -i complete
     else
-        wf-recorder -f "$HOME/$fileName" --codec=gif
+        # Start recording
+        fileName=$(date +%Y-%m-%dT%H:%M:%SZ).gif
+        canberra-gtk-play -i camera-shutter
+        wf-recorder -c gif -f "$HOME/$fileName" &
     fi
-
-    # Record 10 seconds
-    #sleep 10s; pkill -SIGINT wf-recorder
 else
     source $HOME/.local/bin/master.sh
 
