@@ -56,21 +56,48 @@ The best time to plant a tree was 20 years ago. The second best time is <span st
   </a>
 </div>
 
-## 💻Projects
-<a href="https://github.com/yaoniplan/note">
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://github-readme-stats-fast.vercel.app/api/pin/?username=yaoniplan&repo=note&theme=dark&bg_color=161B22&text_color=c9d1d9&title_color=0877d2&icon_color=0877d2&border_radius=8&hide_border=true">
-  <source media="(prefers-color-scheme: light)" srcset="https://github-readme-stats-fast.vercel.app/api/pin/?username=yaoniplan&repo=note&theme=default">
-  <img alt="Repo-card" src="https://github-readme-stats-fast.vercel.app/api/pin/?username=yaoniplan&repo=note&theme=default">
-</picture>
-</a>
-<a href="https://github.com/yaoniplan/dotfiles">
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://github-readme-stats-fast.vercel.app/api/pin/?username=yaoniplan&repo=dotfiles&theme=dark&bg_color=161B22&text_color=c9d1d9&title_color=0877d2&icon_color=0877d2&border_radius=8&hide_border=true">
-  <source media="(prefers-color-scheme: light)" srcset="https://github-readme-stats-fast.vercel.app/api/pin/?username=yaoniplan&repo=dotfiles&theme=default">
-  <img alt="Repo-card" src="https://github-readme-stats-fast.vercel.app/api/pin/?username=yaoniplan&repo=dotfiles&theme=default">
-</picture>
-</a>
+## 💻 Projects
+
+<div style="
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+">
+  <a href="https://github.com/yaoniplan/note" style="
+    display: block;
+    width: 320px;
+    height: 90px;
+    padding: 14px 16px;
+    border-radius: 12px;
+    background-color: rgba(128,128,128,0.12);
+    color: inherit;
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 700;
+    box-sizing: border-box;
+  ">
+    note<br>
+    <span style="font-size: 13px; font-weight: 400; opacity: 0.85; line-height: 1.4;">Expediting the procedure of constructing the wheel</span>
+  </a>
+
+  <a href="https://github.com/yaoniplan/dotfiles" style="
+    display: block;
+    width: 320px;
+    height: 90px;
+    padding: 14px 16px;
+    border-radius: 12px;
+    background-color: rgba(128,128,128,0.12);
+    color: inherit;
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 700;
+    box-sizing: border-box;
+  ">
+    dotfiles<br>
+    <span style="font-size: 13px; font-weight: 400; opacity: 0.85; line-height: 1.4;">Minimal dotfiles in Linux server</span>
+  </a>
+</div>
 
 ## ⚡Skills
 <picture>
