@@ -27,3 +27,7 @@ The best time to plant a tree was 20 years ago. The second best time is <span st
   <source media="(prefers-color-scheme: light)" srcset="https://skillicons.dev/icons?i=arch,bash,cloudflare,css,debian,docker,flask,git,github,html,js,latex,linux,lua,md,neovim,nix,nodejs,npm,py,regex,sqlite,selenium,svg,ubuntu,vim,vscode,workers&perline=14&theme=light">
   <img alt="Repo-card" src="https://skillicons.dev/icons?i=arch,bash,cloudflare,css,debian,docker,flask,git,github,html,js,latex,linux,lua,md,neovim,nix,nodejs,npm,py,regex,sqlite,selenium,svg,ubuntu,vim,vscode,workers&perline=14&theme=light">
 </picture>
+
+<div style="text-align: center;">
+  Powered by <a href="https://nn.ci">nn.ci</a>
+</div>
