@@ -14,6 +14,7 @@ PROVIDERS = [
     "copy",
     "manwa",
     "guazi",
+    "hip",
     "manhuagui",
 ]
 
