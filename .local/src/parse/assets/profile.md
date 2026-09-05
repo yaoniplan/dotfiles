@@ -135,11 +135,12 @@ The best time to plant a tree was 20 years ago. The second best time is <span st
   </a>
 </div>
 
-## ⚡Skills
+## ⚡ Skills
+
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://skillicons.dev/icons?i=arch,bash,cloudflare,css,debian,docker,flask,git,github,html,js,latex,linux,lua,md,neovim,nix,nodejs,npm,py,regex,sqlite,selenium,svg,ubuntu,vim,vscode,workers&perline=14">
-  <source media="(prefers-color-scheme: light)" srcset="https://skillicons.dev/icons?i=arch,bash,cloudflare,css,debian,docker,flask,git,github,html,js,latex,linux,lua,md,neovim,nix,nodejs,npm,py,regex,sqlite,selenium,svg,ubuntu,vim,vscode,workers&perline=14&theme=light">
-  <img alt="Repo-card" src="https://skillicons.dev/icons?i=arch,bash,cloudflare,css,debian,docker,flask,git,github,html,js,latex,linux,lua,md,neovim,nix,nodejs,npm,py,regex,sqlite,selenium,svg,ubuntu,vim,vscode,workers&perline=14&theme=light">
+  <source media="(prefers-color-scheme: dark)" srcset="https://skillicons.dev/icons?i=apple,arch,bash,bsd,c,cloudflare,css,debian,devto,discord,docker,emacs,flask,gcp,git,github,githubactions,gmail,html,js,kali,latex,linux,lua,md,neovim,nix,nodejs,npm,perl,pnpm,py,qt,regex,sqlite,stackoverflow,selenium,svg,twitter,ts,ubuntu,vim,vscode,windows,workers">
+  <source media="(prefers-color-scheme: light)" srcset="https://skillicons.dev/icons?i=apple,arch,bash,bsd,c,cloudflare,css,debian,devto,discord,docker,emacs,flask,gcp,git,github,githubactions,gmail,html,js,kali,latex,linux,lua,md,neovim,nix,nodejs,npm,perl,pnpm,py,qt,regex,sqlite,stackoverflow,selenium,svg,twitter,ts,ubuntu,vim,vscode,windows,workers&theme=light">
+  <img alt="Repo-card" src="https://skillicons.dev/icons?i=apple,arch,bash,bsd,c,cloudflare,css,debian,devto,discord,docker,emacs,flask,gcp,git,github,githubactions,gmail,html,js,kali,latex,linux,lua,md,neovim,nix,nodejs,npm,perl,pnpm,py,qt,regex,sqlite,stackoverflow,selenium,svg,twitter,ts,ubuntu,vim,vscode,windows,workers">
 </picture>
 
 <div style="text-align: center;">
