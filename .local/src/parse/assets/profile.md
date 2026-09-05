@@ -70,7 +70,8 @@ The best time to plant a tree was 20 years ago. The second best time is <span st
     height: 90px;
     padding: 14px 16px;
     border-radius: 12px;
-    background-color: rgba(128,128,128,0.12);
+    border: 1px solid rgba(128,128,128,0.3);
+    background-color: transparent;
     color: inherit;
     text-decoration: none;
     font-size: 15px;
@@ -87,7 +88,8 @@ The best time to plant a tree was 20 years ago. The second best time is <span st
     height: 90px;
     padding: 14px 16px;
     border-radius: 12px;
-    background-color: rgba(128,128,128,0.12);
+    border: 1px solid rgba(128,128,128,0.3);
+    background-color: transparent;
     color: inherit;
     text-decoration: none;
     font-size: 15px;
