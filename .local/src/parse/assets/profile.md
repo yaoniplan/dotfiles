@@ -61,46 +61,77 @@ The best time to plant a tree was 20 years ago. The second best time is <span st
 
 ## 💻 Projects
 
-<div style="
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  justify-content: center;
-">
-  <a href="https://github.com/yaoniplan/note" style="
+<style>
+  .project-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .project-grid .project-card,
+  .project-grid .project-card:visited,
+  .project-grid .project-card:hover,
+  .project-grid .project-card:active {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .project-card {
     display: block;
-    width: 320px;
     height: 90px;
     padding: 14px 16px;
     border-radius: 12px;
     border: 1px solid rgba(128,128,128,0.3);
     background-color: transparent;
-    color: inherit;
-    text-decoration: none;
+
     font-size: 15px;
     font-weight: 700;
     box-sizing: border-box;
-  ">
+  }
+
+  .project-card span {
+    font-size: 13px;
+    font-weight: 400;
+    opacity: 0.85;
+    line-height: 1.4;
+  }
+
+  @media (max-width: 600px) {
+    .project-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<div class="project-grid">
+  <a class="project-card" href="https://github.com/yaoniplan/note">
     note<br>
-    <span style="font-size: 13px; font-weight: 400; opacity: 0.85; line-height: 1.4;">Expediting the procedure of constructing the wheel</span>
+    <span>Expediting the procedure of constructing the wheel</span>
   </a>
 
-  <a href="https://github.com/yaoniplan/dotfiles" style="
-    display: block;
-    width: 320px;
-    height: 90px;
-    padding: 14px 16px;
-    border-radius: 12px;
-    border: 1px solid rgba(128,128,128,0.3);
-    background-color: transparent;
-    color: inherit;
-    text-decoration: none;
-    font-size: 15px;
-    font-weight: 700;
-    box-sizing: border-box;
-  ">
+  <a class="project-card" href="https://github.com/yaoniplan/dotfiles">
     dotfiles<br>
-    <span style="font-size: 13px; font-weight: 400; opacity: 0.85; line-height: 1.4;">Minimal dotfiles in Linux server</span>
+    <span>Minimal dotfiles in Linux server</span>
+  </a>
+
+  <a class="project-card" href="https://github.com/yaoniplan/dotfiles/tree/development/.local/src/ani">
+    ani<br>
+    <span>Watch anime</span>
+  </a>
+
+  <a class="project-card" href="https://github.com/yaoniplan/dotfiles/tree/development/.local/src/com">
+    com<br>
+    <span>Read comic</span>
+  </a>
+
+  <a class="project-card" href="https://github.com/yaoniplan/dotfiles/tree/development/.local/src/parse">
+    parse<br>
+    <span>Parse markdown</span>
+  </a>
+
+  <a class="project-card" href="https://github.com/yaoniplan/dotfiles/tree/development/.local/src/userscript">
+    userscript<br>
+    <span>Improve the user experience</span>
   </a>
 </div>
 
