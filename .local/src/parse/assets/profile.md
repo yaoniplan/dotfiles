@@ -138,9 +138,12 @@ The best time to plant a tree was 20 years ago. The second best time is <span st
 ## ⚡ Skills
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://skillicons.dev/icons?i=apple,arch,bash,bsd,c,cloudflare,css,debian,devto,discord,docker,emacs,flask,gcp,git,github,githubactions,gmail,html,js,kali,latex,linux,lua,md,neovim,nix,nodejs,npm,perl,pnpm,py,qt,regex,sqlite,stackoverflow,selenium,svg,twitter,ts,ubuntu,vim,vscode,windows,workers">
-  <source media="(prefers-color-scheme: light)" srcset="https://skillicons.dev/icons?i=apple,arch,bash,bsd,c,cloudflare,css,debian,devto,discord,docker,emacs,flask,gcp,git,github,githubactions,gmail,html,js,kali,latex,linux,lua,md,neovim,nix,nodejs,npm,perl,pnpm,py,qt,regex,sqlite,stackoverflow,selenium,svg,twitter,ts,ubuntu,vim,vscode,windows,workers&theme=light">
-  <img alt="Repo-card" src="https://skillicons.dev/icons?i=apple,arch,bash,bsd,c,cloudflare,css,debian,devto,discord,docker,emacs,flask,gcp,git,github,githubactions,gmail,html,js,kali,latex,linux,lua,md,neovim,nix,nodejs,npm,perl,pnpm,py,qt,regex,sqlite,stackoverflow,selenium,svg,twitter,ts,ubuntu,vim,vscode,windows,workers">
+  <!-- https://skillicons.dev/icons?i=apple,arch,bash,bsd,c,cloudflare,css,debian,devto,discord,docker,emacs,flask,gcp,git,github,githubactions,gmail,html,js,kali,latex,linux,lua,md,neovim,nix,nodejs,npm,perl,pnpm,py,qt,regex,sqlite,stackoverflow,selenium,svg,twitter,ts,ubuntu,vim,vscode,windows,workers -->
+  <source media="(prefers-color-scheme: dark)" srcset="/assets/skills-dark.svg">
+  <!-- https://skillicons.dev/icons?i=apple,arch,bash,bsd,c,cloudflare,css,debian,devto,discord,docker,emacs,flask,gcp,git,github,githubactions,gmail,html,js,kali,latex,linux,lua,md,neovim,nix,nodejs,npm,perl,pnpm,py,qt,regex,sqlite,stackoverflow,selenium,svg,twitter,ts,ubuntu,vim,vscode,windows,workers&theme=light -->
+  <source media="(prefers-color-scheme: light)" srcset="/assets/skills-light.svg">
+  <!-- https://skillicons.dev/icons?i=apple,arch,bash,bsd,c,cloudflare,css,debian,devto,discord,docker,emacs,flask,gcp,git,github,githubactions,gmail,html,js,kali,latex,linux,lua,md,neovim,nix,nodejs,npm,perl,pnpm,py,qt,regex,sqlite,stackoverflow,selenium,svg,twitter,ts,ubuntu,vim,vscode,windows,workers -->
+  <img src="/assets/skills-light.svg" alt="Skills" style="width:100%;" />
 </picture>
 
 <div style="text-align: center;">
