@@ -4,5 +4,6 @@
 - ***Notes***
     - If your browser can use extensions, I suggest switching to [Global Speed](https://github.com/polywock/globalSpeed) (Because it's highly customizable).
 - ***References***
+    - https://greasyfork.org/en/scripts?filter_locale=0&q=yaoniplan
     - Artificial intelligence
 - ---
