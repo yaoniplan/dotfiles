@@ -1,0 +1,9 @@
+- #### Use ["mpv"](https://github.com/yaoniplan/dotfiles/tree/development/.config/mpv)
+    - mpv scripts filenmae: **kebab-case** (hyphens)
+    - Descriptive and self-explanatory names
+    - Example: `notify-title-on-load-and-exit.lua`
+- ***Notes***
+    - Because to improve the user experience.
+- ***References***
+    - Artificial intelligence
+- ---

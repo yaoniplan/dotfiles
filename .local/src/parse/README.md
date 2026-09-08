@@ -1,7 +1,13 @@
-### A lightweight web app
-- that instantly renders any remote Markdown file
-- with authentic GitHub styling
-- automatic light/dark mode
-- and KaTeX math support
-- just append the URL
-- e.g. https://yaoniplan.eu.org/https://note.yaoniplan.eu.org/pages/Future.md
+- #### Use ["parse"](https://github.com/yaoniplan/dotfiles/tree/development/.local/src/parse)
+    - A lightweight web app
+    - that instantly renders any remote Markdown file
+    - with authentic GitHub styling
+    - automatic light/dark mode
+    - and KaTeX math support
+    - just append the URL
+- ***Notes***
+    - Because sometimes we need a fast markdown rendering (such as pictures, formulas, charts)
+- ***References***
+    - https://yaoniplan.eu.org/https://note.yaoniplan.eu.org/pages/Future.md
+    - Artificial intelligence
+- ---

@@ -1,4 +1,4 @@
-- #### Use "ani"
+- #### Use ["ani"](https://github.com/yaoniplan/dotfiles/tree/development/.local/src/ani)
     - `ani`
 - ***Notes***
     - Design philosophy (Make it easier for future developers to write standardized scripts)
@@ -33,7 +33,7 @@
       ```
         - Put https://github.com/yaoniplan/dotfiles/blob/master/.config/mpv/scripts/ani-control.lua into `~/.config/mpv/scripts/` to support playlist
 - ***References***
-    - ![2026-05-08T16:58:42Z.gif](https://github.com/user-attachments/assets/546fd52e-9dc7-4ec0-8ea5-f9f66ae9cd19)
+    - ![2026-05-08T16:58:42Z.gif](https://github.com/yaoniplan/dotfiles/releases/download/assets/2026-05-08T16.58.42Z.gif)
     - https://github.com/Yswag/xptv-extensions/blob/main/js/iyftv.js # Source provider
     - https://github.com/fangkuia/XPTV/blob/main/js/duboku.js # Source provider
     - https://github.com/fangkuia/XPTV/blob/main/js/ole.js # Source provider

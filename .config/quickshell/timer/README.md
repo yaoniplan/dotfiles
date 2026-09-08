@@ -1,4 +1,4 @@
-# Timer
+# [Timer](https://github.com/yaoniplan/dotfiles/tree/development/.config/quickshell/timer)
 
 A lightweight countdown timer for Linux built with **Quickshell**, designed to imitate the **iPhone Dynamic Island Timer**.
 
@@ -371,7 +371,7 @@ As long as it preserves the same **dimensions, geometry, colors, typography, ani
 Do whatever you want with it.
 
 ## References
-- ![2026-08-31T20:50:05Z.gif](https://github.com/user-attachments/assets/939dd9e6-da8d-4ea1-a490-2ab4dd47cc1d)
+- ![2026-08-31T20:50:05Z.gif](https://github.com/yaoniplan/dotfiles/releases/download/assets/2026-08-31T20.50.05Z.gif)
 - https://github.com/yaoniplan/dotfiles/blob/master/.local/bin/timer
 - iPhone Timer style
 - Artificial intelligence

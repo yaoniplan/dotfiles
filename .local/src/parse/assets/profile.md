@@ -113,26 +113,6 @@ The best time to plant a tree was 20 years ago. The second best time is <span st
     dotfiles<br>
     <span>Minimal dotfiles in Linux server</span>
   </a>
-
-  <a class="project-card" href="https://github.com/yaoniplan/dotfiles/tree/development/.local/src/ani">
-    ani<br>
-    <span>Watch anime</span>
-  </a>
-
-  <a class="project-card" href="https://github.com/yaoniplan/dotfiles/tree/development/.local/src/com">
-    com<br>
-    <span>Read comic</span>
-  </a>
-
-  <a class="project-card" href="https://github.com/yaoniplan/dotfiles/tree/development/.local/src/parse">
-    parse<br>
-    <span>Parse markdown</span>
-  </a>
-
-  <a class="project-card" href="https://github.com/yaoniplan/dotfiles/tree/development/.local/src/userscript">
-    userscript<br>
-    <span>Improve the user experience</span>
-  </a>
 </div>
 
 ## ⚡ Skills
