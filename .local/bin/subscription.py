@@ -9,7 +9,7 @@ from pathlib import Path
 CONFIG_DIR = Path.home() / ".config" / "sing-box"
 SUB_API = "https://clash2sfa.xmdhs.com/sub"
 EDITOR = os.environ.get("EDITOR", "vim")
-CONFIGS_SUBDIR = CONFIG_DIR / "configs"
+CONFIGS_SUBDIR = CONFIG_DIR / "profiles"
 
 def url_to_filename(url: str) -> str:
     """Encode URL to a safe filename."""
