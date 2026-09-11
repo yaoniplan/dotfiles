@@ -66,6 +66,10 @@ READER_HTML = r"""<!DOCTYPE html>
         /* 章节：标题 + 正文，标题本身充当分隔 */
         .chapter {
             padding: 1.75rem 0 0.5rem;
+            overflow-anchor: none; /* 避免下方章节插入时把视口拽走 */
+        }
+        .chapter:last-of-type {
+            overflow-anchor: auto;
         }
         .chapter:first-child {
             padding-top: 0.5rem;
@@ -98,6 +102,7 @@ READER_HTML = r"""<!DOCTYPE html>
             align-items: center;
             justify-content: center;
             padding: 2.5rem 0;
+            min-height: 6rem;
             cursor: pointer;
             color: var(--muted);
             font-size: 0.85rem;
@@ -141,7 +146,6 @@ READER_HTML = r"""<!DOCTYPE html>
         const chapterCache = new Map();
         const loadedChapters = new Set();
         let isLoading = false;
-        let hasScrolledToStart = false;
         let lastHistoryChapter = -1;
 
         const container = document.getElementById('container');
@@ -231,13 +235,6 @@ READER_HTML = r"""<!DOCTYPE html>
                     body.appendChild(p);
                 }
                 block.appendChild(body);
-
-                if (!hasScrolledToStart && indexToLoad === INITIAL_INDEX) {
-                    hasScrolledToStart = true;
-                    requestAnimationFrame(() => {
-                        titleEl.scrollIntoView({ block: 'start' });
-                    });
-                }
 
                 currentAppendIndex++;
 
