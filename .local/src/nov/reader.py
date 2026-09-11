@@ -246,21 +246,38 @@ READER_HTML = r"""<!DOCTYPE html>
                     fetchChapter(currentAppendIndex).catch(() => {});
                 }
             } catch (e) {
-                loadingEl.innerHTML = '<span>加载失败，点击重试</span>';
-                loadingEl.onclick = () => {
-                    loadingEl.onclick = null;
-                    container.removeChild(block);
+                loadingEl.innerHTML = '<span>加载失败，自动重试中…</span>';
+                setTimeout(() => {
+                    if (block.parentNode) container.removeChild(block);
                     isLoading = false;
-                    appendNextChapter();
-                };
+                    loadedChapters.delete(indexToLoad);
+                    chapterCache.delete(indexToLoad);
+                    maybeLoadMore();
+                }, 1200);
+                return;
             } finally {
                 isLoading = false;
             }
+
+            // 短章节撑不满一屏时 sentinel 一直在视口内，
+            // IntersectionObserver 不会再次触发 — 主动继续加载
+            maybeLoadMore();
+        }
+
+        let sentinelVisible = true;
+
+        function maybeLoadMore() {
+            if (!sentinelVisible) return;
+            if (isLoading) return;
+            if (currentAppendIndex >= TOTAL_CHAPTERS) return;
+            // 下一帧再调，避免同步递归撑爆调用栈
+            requestAnimationFrame(() => appendNextChapter());
         }
 
         const sentinelObserver = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
-                if (entry.isIntersecting) appendNextChapter();
+                sentinelVisible = entry.isIntersecting;
+                if (sentinelVisible) maybeLoadMore();
             });
         }, { rootMargin: PRELOAD_MARGIN + 'px 0px ' + PRELOAD_MARGIN + 'px 0px' });
 

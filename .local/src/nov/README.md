@@ -38,6 +38,7 @@
         - Focus on novel itself (I don't want to be interrupted by irrelevant content)
 - ***References***
     - ![2026-09-10T17:32:57Z.gif](https://github.com/yaoniplan/dotfiles/releases/download/assets/2026-09-10T17.32.57Z.gif)
+    - https://github.com/juliusnguyen/noveltrans/blob/main/src/noveltrans/scrapers/bqg5.py # Source provider
     - Faloo style (Bold title + paragraph + one blank line + paragraph)
     - Artificial intelligence
 - ---
