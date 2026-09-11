@@ -49,7 +49,7 @@ READER_HTML = r"""<!DOCTYPE html>
             scroll-behavior: auto !important;
             min-height: 100vh;
             font-size: 18px;
-            line-height: 1.7;
+            line-height: 1.65;
         }
         body {
             display: flex;
@@ -60,7 +60,7 @@ READER_HTML = r"""<!DOCTYPE html>
             width: 100%;
             max-width: 720px;
             min-height: 60vh;
-            padding: 1.25rem 1.1rem 4rem;
+            padding: 1.5rem 1.25rem 4rem;
         }
 
         /* 章节：标题 + 正文，标题本身充当分隔 */
@@ -77,7 +77,7 @@ READER_HTML = r"""<!DOCTYPE html>
             color: var(--fg);
             line-height: 1.4;
             text-align: center;
-            margin: 0 0 1.5rem;
+            margin: 0 0 1.25rem;
             letter-spacing: 0.02em;
         }
 
@@ -85,8 +85,8 @@ READER_HTML = r"""<!DOCTYPE html>
             text-indent: 2em;
             text-align: justify;
             word-break: break-word;
-            /* 约 2 倍字号的段间距（舒适，接近飞卢「3倍」观感） */
-            margin: 0 0 2em;
+            /* 约 1 倍字号的段间距（对应飞卢截图：段间约一行空白） */
+            margin: 0 0 1em;
         }
         .chapter-body p:last-child {
             margin-bottom: 0;
