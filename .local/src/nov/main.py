@@ -14,6 +14,7 @@ PROVIDERS = [
     "bqg",
     "ix",
     "bx",
+    "st",
 ]
 
 
