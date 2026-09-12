@@ -13,6 +13,7 @@ from selector import fzf_select, fzf_select_comic_stream
 PROVIDERS = [
     "bqg",
     "ix",
+    "bx",
 ]
 
 
