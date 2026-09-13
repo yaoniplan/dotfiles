@@ -36,15 +36,24 @@ READER_HTML = """<!DOCTYPE html>
 
         img.comic-img {
             width: 100%;
+            height: auto;
             display: block;
             margin: 0;
             border: none;
-            min-height: 300px;
             background: #000000;
             opacity: 0;
             transition: opacity 0.25s ease-in-out;
         }
-        img.comic-img.loaded { opacity: 1; }
+        /* only placeholder while lazy-loading — never stretch real strips */
+        img.comic-img:not(.loaded) {
+            min-height: 200px;
+        }
+        img.comic-img.loaded { opacity: 1; min-height: 0; }
+        img.comic-img.error {
+            min-height: 150px;
+            border: 2px dashed #ff4444;
+            opacity: 1;
+        }
 
         .loading-box {
             display: flex;
@@ -130,12 +139,7 @@ READER_HTML = """<!DOCTYPE html>
                     if (img.dataset.src) {
                         img.onload = () => img.classList.add('loaded');
                         img.onerror = () => {
-                            img.classList.add('loaded');
-                            img.style.minHeight = '150px';
-                            img.style.border = '2px dashed #ff4444';
-                            img.style.display = 'flex';
-                            img.style.alignItems = 'center';
-                            img.style.justifyContent = 'center';
+                            img.classList.add('loaded', 'error');
                             img.alt = '❌ 图片加载失败';
                         };
                         img.src = img.dataset.src;
@@ -300,6 +304,20 @@ def load_custom_flags() -> list:
     return flags
 
 
+def sniff_image_type(data: bytes) -> str:
+    if data.startswith(b"\xff\xd8"):
+        return "image/jpeg"
+    if data.startswith(b"\x89PNG"):
+        return "image/png"
+    if data.startswith(b"GIF8"):
+        return "image/gif"
+    if data.startswith(b"RIFF") and data[8:12] == b"WEBP":
+        return "image/webp"
+    if data.startswith(b"\x00\x00\x00") and b"ftyp" in data[:20]:
+        return "image/avif"
+    return "application/octet-stream"
+
+
 def launch_reader(
     provider,
     card: dict,
@@ -381,7 +399,7 @@ def launch_reader(
                 try:
                     if hasattr(provider, "fetch_image") and callable(provider.fetch_image):
                         img = provider.fetch_image(url)
-                        ctype = "image/jpeg"
+                        ctype = sniff_image_type(img)
                     else:
                         headers = {
                             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
@@ -391,21 +409,28 @@ def launch_reader(
                             headers.update(provider.headers)
                         if hasattr(provider, "session"):
                             headers.update(dict(provider.session.headers))
-                        headers = {k: v for k, v in headers.items() if k.lower() not in ("host", "accept-encoding")}
+                        headers = {
+                            k: v
+                            for k, v in headers.items()
+                            if k.lower() not in ("host", "accept-encoding")
+                        }
                         import requests
-                        if hasattr(provider, "session") and isinstance(provider.session, requests.Session):
+
+                        if hasattr(provider, "session") and isinstance(
+                            provider.session, requests.Session
+                        ):
                             r = provider.session.get(url, headers=headers, timeout=15)
                         else:
                             r = requests.get(url, headers=headers, timeout=15)
                         r.raise_for_status()
                         img = r.content
-                        ctype = r.headers.get("Content-Type", "image/jpeg")
+                        ctype = r.headers.get("Content-Type") or sniff_image_type(img)
                     self.send_response(200)
                     self.send_header("Content-Type", ctype)
                     self.send_header("Cache-Control", "public, max-age=31536000")
                     self.end_headers()
                     self.wfile.write(img)
-                except Exception as e:
+                except Exception:
                     self.send_response(500)
                     self.end_headers()
                 return
@@ -424,15 +449,28 @@ def launch_reader(
     Thread(target=server.serve_forever, daemon=True).start()
 
     browser = next(
-        (b for b in ("chromium", "chromium-browser", "google-chrome", "brave-browser", "microsoft-edge")
-         if subprocess.run(["which", b], capture_output=True).returncode == 0),
+        (
+            b
+            for b in (
+                "chromium",
+                "chromium-browser",
+                "google-chrome",
+                "brave-browser",
+                "microsoft-edge",
+            )
+            if subprocess.run(["which", b], capture_output=True).returncode == 0
+        ),
         None,
     )
     if not browser:
         sys.exit(1)
 
     udd = tempfile.mkdtemp(prefix="com_reader_")
-    cmd = [browser, f"--app=http://127.0.0.1:{port}", f"--user-data-dir={udd}"] + load_custom_flags()
+    cmd = [
+        browser,
+        f"--app=http://127.0.0.1:{port}",
+        f"--user-data-dir={udd}",
+    ] + load_custom_flags()
     kw = {} if SHOW_BROWSER_LOGS else {"stdout": subprocess.DEVNULL, "stderr": subprocess.DEVNULL}
     try:
         subprocess.run(cmd, **kw)
