@@ -13,8 +13,9 @@ from urllib.parse import parse_qs, urlparse
 
 PRELOAD_MARGIN_PX = 3500
 SHOW_BROWSER_LOGS = False
+# server-side fetch retries for /api/img
+IMG_FETCH_RETRIES = 3
 
-# 内置单页应用 HTML/JS/CSS
 READER_HTML = """<!DOCTYPE html>
 <html>
 <head>
@@ -44,15 +45,40 @@ READER_HTML = """<!DOCTYPE html>
             opacity: 0;
             transition: opacity 0.25s ease-in-out;
         }
-        /* only placeholder while lazy-loading — never stretch real strips */
-        img.comic-img:not(.loaded) {
-            min-height: 200px;
-        }
+        img.comic-img:not(.loaded) { min-height: 200px; }
         img.comic-img.loaded { opacity: 1; min-height: 0; }
-        img.comic-img.error {
-            min-height: 150px;
-            border: 2px dashed #ff4444;
-            opacity: 1;
+
+        .img-wrap {
+            width: 100%;
+            position: relative;
+        }
+        .img-error {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            min-height: 180px;
+            padding: 24px 12px;
+            background: #111;
+            border: 1px dashed #555;
+            color: #ccc;
+            cursor: pointer;
+            user-select: none;
+        }
+        .img-error.visible { display: flex; }
+        .img-error:hover { border-color: #aaa; color: #fff; }
+        .img-error .err-title { font-size: 0.95rem; font-weight: 600; }
+        .img-error .err-sub { font-size: 0.8rem; opacity: 0.7; }
+        .img-error .err-btn {
+            margin-top: 4px;
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: 1px solid #666;
+            background: #222;
+            color: #fff;
+            font-size: 0.85rem;
         }
 
         .loading-box {
@@ -121,6 +147,10 @@ READER_HTML = """<!DOCTYPE html>
         const preloadMargin = PRELOAD_MARGIN_PX;
         const chapterNames = CHAPTER_NAMES;
 
+        // client-side image retry (Tachiyomi-style: a few automatic attempts, then manual)
+        const IMG_MAX_RETRIES = 3;
+        const IMG_RETRY_BASE_MS = 600;
+
         const chapterCache = new Map();
         const loadedChapters = new Set();
         let isLoading = false;
@@ -132,21 +162,89 @@ READER_HTML = """<!DOCTYPE html>
         const container = document.getElementById('container');
         const sentinel = document.getElementById('sentinel');
 
+        function loadImage(img, errBox) {
+            const src = img.dataset.src;
+            if (!src) return;
+
+            const attempt = parseInt(img.dataset.attempt || '0', 10);
+
+            img.onload = () => {
+                img.classList.add('loaded');
+                if (errBox) errBox.classList.remove('visible');
+                img.style.display = 'block';
+            };
+
+            img.onerror = () => {
+                if (attempt + 1 < IMG_MAX_RETRIES) {
+                    img.dataset.attempt = String(attempt + 1);
+                    const delay = IMG_RETRY_BASE_MS * Math.pow(2, attempt);
+                    setTimeout(() => {
+                        // cache-bust so intermediary / browser cache of a failed response is skipped
+                        const bust = src + (src.includes('?') ? '&' : '?') + '_r=' + Date.now();
+                        img.src = bust;
+                    }, delay);
+                    return;
+                }
+                // give up → show reload UI
+                img.style.display = 'none';
+                img.classList.add('loaded'); // stop placeholder min-height
+                if (errBox) {
+                    errBox.classList.add('visible');
+                    const sub = errBox.querySelector('.err-sub');
+                    if (sub) sub.textContent = `已重试 ${IMG_MAX_RETRIES} 次 · 点击重新加载`;
+                }
+            };
+
+            img.src = src;
+        }
+
+        function createImageSlot(url, chapterIndex, pageIndex) {
+            const wrap = document.createElement('div');
+            wrap.className = 'img-wrap';
+
+            const img = document.createElement('img');
+            img.className = 'comic-img';
+            img.dataset.src = `/api/img?url=${encodeURIComponent(url)}`;
+            img.dataset.chapterIndex = chapterIndex;
+            img.dataset.pageIndex = pageIndex;
+            img.dataset.attempt = '0';
+            img.alt = '';
+
+            const errBox = document.createElement('div');
+            errBox.className = 'img-error';
+            errBox.innerHTML = `
+                <div class="err-title">❌ 图片加载失败</div>
+                <div class="err-sub">点击重新加载</div>
+                <div class="err-btn">重新加载</div>
+            `;
+            errBox.addEventListener('click', () => {
+                errBox.classList.remove('visible');
+                img.style.display = 'block';
+                img.classList.remove('loaded');
+                img.dataset.attempt = '0';
+                // force reload with cache bust
+                const base = img.dataset.src;
+                img.src = base + (base.includes('?') ? '&' : '?') + '_r=' + Date.now();
+                // re-arm handlers
+                loadImage(img, errBox);
+            });
+
+            wrap.appendChild(img);
+            wrap.appendChild(errBox);
+
+            imgObserver.observe(img);
+            historyObserver.observe(img);
+            return { wrap, img };
+        }
+
         const imgObserver = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    const img = entry.target;
-                    if (img.dataset.src) {
-                        img.onload = () => img.classList.add('loaded');
-                        img.onerror = () => {
-                            img.classList.add('loaded', 'error');
-                            img.alt = '❌ 图片加载失败';
-                        };
-                        img.src = img.dataset.src;
-                        delete img.dataset.src;
-                    }
-                    imgObserver.unobserve(img);
-                }
+                if (!entry.isIntersecting) return;
+                const img = entry.target;
+                if (!img.dataset.src) return;
+                const errBox = img.parentElement && img.parentElement.querySelector('.img-error');
+                loadImage(img, errBox);
+                imgObserver.unobserve(img);
             });
         }, { rootMargin: `${preloadMargin}px 0px ${preloadMargin}px 0px` });
 
@@ -217,16 +315,8 @@ READER_HTML = """<!DOCTYPE html>
                 let targetScrollImg = null;
 
                 data.images.forEach((url, imgIdx) => {
-                    const img = document.createElement('img');
-                    img.className = 'comic-img';
-                    img.dataset.src = `/api/img?url=${encodeURIComponent(url)}`;
-                    img.dataset.chapterIndex = indexToLoad;
-                    img.dataset.pageIndex = imgIdx;
-
-                    imgObserver.observe(img);
-                    historyObserver.observe(img);
-
-                    container.appendChild(img);
+                    const { wrap, img } = createImageSlot(url, indexToLoad, imgIdx);
+                    container.appendChild(wrap);
 
                     if (!hasScrolledToTargetPage && indexToLoad === INITIAL_INDEX && imgIdx === targetStartPage) {
                         targetScrollImg = img;
@@ -318,6 +408,48 @@ def sniff_image_type(data: bytes) -> str:
     return "application/octet-stream"
 
 
+def fetch_image_bytes(provider, url: str) -> tuple[bytes, str]:
+    """Fetch image with retries. Returns (bytes, content_type)."""
+    last_err: Exception | None = None
+    for attempt in range(IMG_FETCH_RETRIES):
+        try:
+            if hasattr(provider, "fetch_image") and callable(provider.fetch_image):
+                img = provider.fetch_image(url)
+                return img, sniff_image_type(img)
+
+            headers = {
+                "User-Agent": (
+                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                    "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"
+                ),
+                "Accept": "image/webp,image/apng,image/*,*/*;q=0.8",
+            }
+            if hasattr(provider, "headers"):
+                headers.update(provider.headers)
+            if hasattr(provider, "session"):
+                headers.update(dict(provider.session.headers))
+            headers = {
+                k: v
+                for k, v in headers.items()
+                if k.lower() not in ("host", "accept-encoding")
+            }
+            import requests
+
+            if hasattr(provider, "session") and isinstance(
+                provider.session, requests.Session
+            ):
+                r = provider.session.get(url, headers=headers, timeout=20)
+            else:
+                r = requests.get(url, headers=headers, timeout=20)
+            r.raise_for_status()
+            ctype = r.headers.get("Content-Type") or sniff_image_type(r.content)
+            return r.content, ctype
+        except Exception as e:
+            last_err = e
+            time.sleep(0.4 * (attempt + 1))
+    raise last_err or RuntimeError(f"image fetch failed: {url}")
+
+
 def launch_reader(
     provider,
     card: dict,
@@ -397,41 +529,14 @@ def launch_reader(
                 if url.startswith("//"):
                     url = "https:" + url
                 try:
-                    if hasattr(provider, "fetch_image") and callable(provider.fetch_image):
-                        img = provider.fetch_image(url)
-                        ctype = sniff_image_type(img)
-                    else:
-                        headers = {
-                            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-                            "Accept": "image/webp,image/apng,image/*,*/*;q=0.8",
-                        }
-                        if hasattr(provider, "headers"):
-                            headers.update(provider.headers)
-                        if hasattr(provider, "session"):
-                            headers.update(dict(provider.session.headers))
-                        headers = {
-                            k: v
-                            for k, v in headers.items()
-                            if k.lower() not in ("host", "accept-encoding")
-                        }
-                        import requests
-
-                        if hasattr(provider, "session") and isinstance(
-                            provider.session, requests.Session
-                        ):
-                            r = provider.session.get(url, headers=headers, timeout=15)
-                        else:
-                            r = requests.get(url, headers=headers, timeout=15)
-                        r.raise_for_status()
-                        img = r.content
-                        ctype = r.headers.get("Content-Type") or sniff_image_type(img)
+                    img, ctype = fetch_image_bytes(provider, url)
                     self.send_response(200)
                     self.send_header("Content-Type", ctype)
                     self.send_header("Cache-Control", "public, max-age=31536000")
                     self.end_headers()
                     self.wfile.write(img)
                 except Exception:
-                    self.send_response(500)
+                    self.send_response(502)
                     self.end_headers()
                 return
 
