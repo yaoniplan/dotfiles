@@ -6,7 +6,8 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 def fzf_select(options, prompt="选择: "):
     if not options:
         proc = subprocess.run(
-            ["fzf", "--print-query", "--prompt", prompt, "--height", "~100%", "--reverse"],
+            ["fzf", "--print-query", "--prompt", prompt, "--height", "~100%", "--reverse",
+             "--info-command=printf '%s/%s' \"$FZF_POS\" \"$FZF_INFO\""],
             input="",
             text=True,
             stdout=subprocess.PIPE,
@@ -14,7 +15,8 @@ def fzf_select(options, prompt="选择: "):
         return proc.stdout.split("\n", 1)[0].strip() or None
     try:
         proc = subprocess.run(
-            ["fzf", "--prompt", prompt, "--height", "~100%", "--reverse"],
+            ["fzf", "--prompt", prompt, "--height", "~100%", "--reverse",
+             "--info-command=printf '%s/%s' \"$FZF_POS\" \"$FZF_INFO\""],
             input="\n".join(options),
             text=True,
             stdout=subprocess.PIPE,
@@ -28,7 +30,8 @@ def fzf_select(options, prompt="选择: "):
 
 def fzf_select_comic_stream(provider_names, load_provider, keyword):
     proc = subprocess.Popen(
-        ["fzf", "--prompt", "选择漫画: ", "--height", "100%", "--reverse", "--no-sort"],
+        ["fzf", "--prompt", "选择漫画: ", "--height", "100%", "--reverse", "--no-sort",
+         "--info-command=printf '%s/%s' \"$FZF_POS\" \"$FZF_INFO\""],
         stdin=subprocess.PIPE,
         stdout=subprocess.PIPE,
         text=True,
