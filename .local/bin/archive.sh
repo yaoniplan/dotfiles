@@ -2,7 +2,6 @@
 
 set -euo pipefail
 
-# Print usage information
 usage() {
   cat <<EOF
 Usage: $(basename "$0") [OPTIONS] <URL>
@@ -51,29 +50,28 @@ fi
 
 USER_AGENT="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
 
-# Portable JSON extractor (uses jq if available, grep/cut as fallback)
+# Helper: extracts JSON fields using jq if available, grep/cut as fallback
 extract_json_field() {
   local json="$1"
   local field="$2"
 
   if command -v jq >/dev/null 2>&1; then
-    echo "$json" | jq -r ".${field} // empty"
+    echo "$json" | jq -r ".${field} // empty" 2>/dev/null || true
   else
-    echo "$json" | grep -o "\"${field}\":[[:space:]]*\"[^\"]*\"" | head -n1 | cut -d'"' -f4
+    echo "$json" | grep -o "\"${field}\":[[:space:]]*\"[^\"]*\"" | head -n1 | cut -d'"' -f4 || true
   fi
 }
 
 # -------------------------------------------------------------------
-# Phase 1: Availability Check (Instant)
+# Phase 1: Availability Check (Instant ~100-200ms)
 # -------------------------------------------------------------------
 if [[ $FORCE_CRAWL -eq 0 ]]; then
-  AVAIL_RESP=$(curl -s -A "$USER_AGENT" "https://archive.org/wayback/available?url=$TARGET_URL")
+  AVAIL_RESP=$(curl -s -L -A "$USER_AGENT" "https://archive.org/wayback/available?url=$TARGET_URL")
 
-  # Check if a snapshot exists
   if command -v jq >/dev/null 2>&1; then
-    EXISTING_URL=$(echo "$AVAIL_RESP" | jq -r '.archived_snapshots.closest.url // empty')
+    EXISTING_URL=$(echo "$AVAIL_RESP" | jq -r '.archived_snapshots.closest.url // empty' 2>/dev/null || true)
   else
-    EXISTING_URL=$(echo "$AVAIL_RESP" | grep -o '"url":[[:space:]]*"[^"]*"' | head -n1 | cut -d'"' -f4)
+    EXISTING_URL=$(echo "$AVAIL_RESP" | grep -o '"url":[[:space:]]*"[^"]*"' | head -n1 | cut -d'"' -f4 || true)
   fi
 
   if [[ -n "$EXISTING_URL" && "$EXISTING_URL" != "null" ]]; then
@@ -91,7 +89,7 @@ SECRET_KEY="${IA_SECRET_KEY:-${WAYBACK_SECRET_KEY:-}}"
 
 if [[ -n "$ACCESS_KEY" && -n "$SECRET_KEY" ]]; then
   # Fast Path: S3 API Queuing (~200ms)
-  SAVE_RESP=$(curl -s -X POST "https://web.archive.org/save/" \
+  SAVE_RESP=$(curl -s -L -X POST "https://web.archive.org/save/" \
     -H "Accept: application/json" \
     -H "Authorization: LOW ${ACCESS_KEY}:${SECRET_KEY}" \
     -A "$USER_AGENT" \
@@ -113,15 +111,22 @@ if [[ -n "$ACCESS_KEY" && -n "$SECRET_KEY" ]]; then
   fi
 
 else
-  # Fallback Path: Synchronous Public Crawl (5-15 seconds)
+  # Fallback Path: Synchronous Public Crawl with Header Parsing (5-15s)
   echo "No API keys found. Crawling page in real time..."
-  FINAL_URL=$(curl -s -L -o /dev/null -w "%{url_effective}" -A "$USER_AGENT" "https://web.archive.org/save/$TARGET_URL")
 
-  if [[ "$FINAL_URL" == *"web.archive.org/web/"* ]]; then
+  RESPONSE_HEADERS=$(curl -s -L -i -A "$USER_AGENT" "https://web.archive.org/save/$TARGET_URL")
+  REL_PATH=$(echo "$RESPONSE_HEADERS" | grep -iE '^(content-location|location):' | head -n1 | tr -d '\r' | awk '{print $2}' || true)
+
+  if [[ -n "$REL_PATH" ]]; then
+    if [[ "$REL_PATH" == http* ]]; then
+      SNAPSHOT_URL="$REL_PATH"
+    else
+      SNAPSHOT_URL="https://web.archive.org${REL_PATH}"
+    fi
     echo "Successfully archived!"
-    echo "Snapshot URL: $FINAL_URL"
+    echo "Snapshot URL: $SNAPSHOT_URL"
   else
-    echo "Archive request submitted. Result URL:"
-    echo "$FINAL_URL"
+    echo "Archive request submitted!"
+    echo "Snapshot URL: https://web.archive.org/web/$TARGET_URL"
   fi
 fi
