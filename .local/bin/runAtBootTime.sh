@@ -8,12 +8,17 @@ if [[ "$XDG_SESSION_TYPE" = "wayland" ]]; then
         fi
     }
 
-    execute_command foot --server
+    #pkill clash; execute_command clash
+    #execute_command foot --server
+    execute_command waybar
     execute_command udiskie
     execute_command mako
-    execute_command wlsunset -l 28.2 -L 116.6
-    execute_command swww-daemon
-    execute_command rclone mount yaoniplan:/ /mnt/yaoniplan/ --header "Referer:"
+    #execute_command monitor.sh
+    #execute_command wlsunset -t 1000 -T 1500
+    execute_command awww-daemon
+    execute_command checkin.sh auto
+    #execute_command podman start openlist
+    #execute_command rclone mount yaoniplan:/ /mnt/yaoniplan/ --header "Referer:"
 else
     if command -v feh &>/dev/null; then
         feh --bg-fill $HOME/note/assets/dark.jpg
