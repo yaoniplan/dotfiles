@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Set variables
-repoDir="$HOME/note"
+repoDir="$HOME/.config/note"
 readmeFile="$repoDir/README.md"
 journalsDir="$repoDir/journals"
 indexFile="$repoDir/assets/index.html"
@@ -20,10 +20,19 @@ sendToTheClipboard() {
 
 # Set functions
 notification () {
-    export $(dbus-launch); notify-send "$notificationMessage" &
+    if [[ "$XDG_SESSION_TYPE" = "wayland" ]]; then
+        notify-send "$notificationMessage" &
 
-    for i in {1..2}
-    do
-        paplay "$audioFile"
-    done
+        for i in {1..2}
+        do
+            paplay "$audioFile"
+        done
+    else
+        export $(dbus-launch); notify-send "$notificationMessage" &
+
+        for i in {1..2}
+        do
+            paplay "$audioFile"
+        done
+    fi
 }
