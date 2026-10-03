@@ -42,9 +42,12 @@ if [[ "$XDG_SESSION_TYPE" = "wayland" ]]; then
         api)
             # List of API commands – each outputs an image URL
             api_commands=(
-                'curl -Ls -o /dev/null -w "%{url_effective}" "https://www.aini.cn.eu.org/random"'
-                'curl -s "https://wallhaven.cc/api/v1/search?q=fractal&purity=100&sorting=random" | jq -r ".data[0].path"'
-                'curl -sL -o /dev/null -w "%{url_effective}\n" https://tool.teyonds.com/api'
+                #'curl -Ls -o /dev/null -w "%{url_effective}" "https://www.aini.cn.eu.org/random"'
+                'curl -s "https://wallhaven.cc/api/v1/search?categories=111&purity=100&sorting=random&ratios=16x9&atleast=1366x768" | jq -r ".data[0].path"'
+                #'curl -s "https://wallhaven.cc/api/v1/search?q=anime&categories=010&purity=100&sorting=random&resolutions=1366x768" | jq -r ".data[0].path"'
+                #'curl -s "https://wallhaven.cc/api/v1/search?q=anime&categories=010&purity=100&sorting=random&ratios=16x9&atleast=1280x720" | jq -r ".data[0].path"'
+                #'curl -s "https://wallhaven.cc/api/v1/search?q=fractal&purity=100&sorting=random" | jq -r ".data[0].path"'
+                #'curl -sL -o /dev/null -w "%{url_effective}\n" https://tool.teyonds.com/api'
             )
 
             # Shuffle the list, preserving each full command as one array entry
