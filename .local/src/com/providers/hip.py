@@ -52,6 +52,7 @@ def key_to_works_id(key: str) -> str:
 
 
 def image_base(line: int) -> str:
+    # Only line==9 uses the secure host; never build hip-tx-{line}.
     return IMAGE_BASE_SECURE if line == 9 else IMAGE_BASE
 
 
@@ -100,6 +101,12 @@ def derive_api_hid(chapter_key: str) -> str:
     return f"{_b64_encode_nopad(f'c:{cid}')}-{seg2}"
 
 
+def _page_stem(path: str) -> str:
+    """NDUyYTBl..._19.c9e8jl.webp → NDUyYTBl..._19"""
+    name = path.rsplit("/", 1)[-1]
+    return name.split(".", 1)[0]
+
+
 class Provider:
     name = "hip"
     #name = "嬉皮漫畫"
@@ -139,6 +146,28 @@ class Provider:
         else:
             key = str(comic or "")
         return key[2:] if key.startswith("m:") else key
+
+    def _is_placeholder(self, url: str) -> bool:
+        """CDN may serve a ~67-byte PNG under a .webp filename."""
+        try:
+            r = self.session.head(
+                url,
+                headers={
+                    "Referer": BASE_URL + "/",
+                    "Accept": "image/avif,image/webp,image/*,*/*;q=0.8",
+                },
+                timeout=8,
+                allow_redirects=True,
+            )
+            ctype = (r.headers.get("Content-Type") or "").lower()
+            size = int(r.headers.get("Content-Length") or 0)
+            if size and size < 200:
+                return True
+            if "png" in ctype and (not size or size < 1024):
+                return True
+            return False
+        except Exception:
+            return False
 
     def search(self, query: str, limit: int = 20, offset: int = 0) -> list[dict]:
         page = max(1, (offset // max(limit, 1)) + 1)
@@ -211,7 +240,7 @@ class Provider:
                     }
                 )
 
-        chapters.reverse()
+        chapters.reverse()  # API is newest-first → oldest-first for reading
         return chapters
 
     def resolve_read(self, chapter, comic=None) -> list[str]:
@@ -236,7 +265,33 @@ class Provider:
         line = int(data.get("line") or 1)
         base = image_base(line)
         paths = decode_images(images_blob)
-        return [f"{base}{p}" for p in paths]
+
+        # API sometimes emits both a ~67B PNG placeholder and the real WebP
+        # for the same page index (order is NOT stable). Group by stem and
+        # only HEAD when there are collisions.
+        groups: dict[str, list[str]] = {}
+        order: list[str] = []
+        for p in paths:
+            stem = _page_stem(p)
+            if stem not in groups:
+                order.append(stem)
+                groups[stem] = []
+            groups[stem].append(p)
+
+        out: list[str] = []
+        for stem in order:
+            cands = groups[stem]
+            if len(cands) == 1:
+                out.append(f"{base}{cands[0]}")
+                continue
+            chosen = None
+            for p in cands:
+                url = f"{base}{p}"
+                if not self._is_placeholder(url):
+                    chosen = url
+                    break
+            out.append(chosen or f"{base}{cands[0]}")
+        return out
 
     def fetch_image(self, url: str) -> bytes:
         r = self.session.get(
