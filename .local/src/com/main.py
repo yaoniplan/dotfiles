@@ -16,6 +16,8 @@ PROVIDERS = [
     "guazi",
     "hip",
     "manhuagui",
+    "dumanwu",
+    "tencent",
 ]
 
 
