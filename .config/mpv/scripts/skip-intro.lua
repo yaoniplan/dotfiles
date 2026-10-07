@@ -1,247 +1,131 @@
 -- https://github.com/rui-ddc/skip-intro
-MAX_SPEED = 100
-NORMAL_SPEED = 1
-ONE_SECOND = 1
-skip = false
-startTime = 0
-memory = {}
-
--- Max noise (dB) and min silence duration (s) to trigger
+-- Hold Tab = smooth scrub forward, Shift+Tab = backward, release Tab = set anchor
 opts = {
-    quietness = -30,
-    duration = 0.5,
-    memory_file = "~~/intro_memory.json",  -- 记忆文件
-    auto_skip = true,                      -- 有记忆时自动跳转
-    min_skip = 20,                         -- 最小有效秒数
-    max_skip = 180,                        -- 最大有效秒数
-    osd_time = 2,
+    memory_file    = "~~/.intro_memory.txt",
+    auto_skip      = true,
+    min_skip       = 5,
+    max_skip       = 300,
+    osd_time       = 2,
+    scrub_interval = 0.03,   -- timer interval (smaller = smoother)
+    scrub_step     = 0.05,   -- seconds per step (smaller = finer)
 }
 
-function setOptions()
-    local options = require 'mp.options'
-    options.read_options(opts)
-end
+memory = {}
+local scrub_timer = nil
 
-function setTime(time)
-    mp.set_property_number('time-pos', time)
+function setOptions()
+    require 'mp.options'.read_options(opts)
 end
 
 function getTime()
-    return mp.get_property_native('time-pos')
+    return mp.get_property_native('time-pos') or 0
 end
 
-function setSpeed(speed)
-    mp.set_property('speed', speed)
+function setTime(t)
+    mp.set_property_number('time-pos', t)
 end
 
-function setPause(state)
-    mp.set_property_bool('pause', state)
-end
-
-function setMute(state)
-    mp.set_property_bool('mute', state)
-end
-
--- 从 media-title 提取系列名
--- 只去掉前缀 [xxx] 和后缀 " - xxx"
--- 例: "[vod] 我独自盗墓 - 第06集" → "我独自盗墓"
+-- "[vod] Series Name - Ep06" → "Series Name"
 function get_series_name()
     local title = mp.get_property("media-title") or ""
-    title = title:gsub("^%[[^%]]+%]%s*", "")   -- 去掉 [xxx]
-    title = title:gsub("%s*%-.*$", "")          -- 去掉 " - xxx"
-    title = title:match("^%s*(.-)%s*$") or title -- trim
-    if title == "" then return nil end
-    return title
+    title = title:gsub("^%[[^%]]+%]%s*", ""):gsub("%s*%-.*$", "")
+    title = title:match("^%s*(.-)%s*$") or title
+    return title ~= "" and title or nil
 end
 
 function load_memory()
-    local utils = require 'mp.utils'
+    memory = {}
     local path = mp.command_native({"expand-path", opts.memory_file})
     local f = io.open(path, "r")
-    if not f then
-        memory = {}
-        return
+    if not f then return end
+    for line in f:lines() do
+        local t, name = line:match("^([%d%.]+)%s+(.+)$")
+        if t and name then
+            memory[name] = tonumber(t)
+        end
     end
-    local content = f:read("*a")
     f:close()
-    local data = utils.parse_json(content)
-    if type(data) == "table" then
-        memory = data
-    else
-        memory = {}
-    end
 end
 
-function save_memory()
-    local utils = require 'mp.utils'
+-- newest entry written at the top
+function save_memory(first_key, first_val)
     local path = mp.command_native({"expand-path", opts.memory_file})
     local f = io.open(path, "w")
-    if f then
-        f:write(utils.format_json(memory))
-        f:close()
+    if not f then return end
+    if first_key then
+        f:write(string.format("%.6f %s\n", first_val, first_key))
     end
-end
-
-function initAudioFilter()
-    local af_table = mp.get_property_native('af')
-    af_table[#af_table + 1] = {
-        enabled = false,
-        label   = 'silencedetect',
-        name    = 'lavfi',
-        params  = { graph = 'silencedetect=noise=' .. opts.quietness .. 'dB:d=' .. opts.duration }
-    }
-    mp.set_property_native('af', af_table)
-end
-
-function initVideoFilter()
-    local vf_table = mp.get_property_native('vf')
-    vf_table[#vf_table + 1] = {
-        enabled = false,
-        label   = 'blackout',
-        name    = 'lavfi',
-        params  = { graph = '' }
-    }
-    mp.set_property_native('vf', vf_table)
-end
-
-function setAudioFilter(state)
-    local af_table = mp.get_property_native('af')
-    if #af_table > 0 then
-        for i = #af_table, 1, -1 do
-            if af_table[i].label == 'silencedetect' then
-                af_table[i].enabled = state
-                mp.set_property_native('af', af_table)
-                break
-            end
+    for k, v in pairs(memory) do
+        if k ~= first_key and type(v) == "number" then
+            f:write(string.format("%.6f %s\n", v, k))
         end
     end
+    f:close()
 end
 
-function dim(state)
-    local dim = { width = 0, height = 0 }
-    if state == true then
-        dim.width = mp.get_property_native('width')
-        dim.height = mp.get_property_native('height')
-    end
-    return dim.width .. 'x' .. dim.height
-end
-
-function setVideoFilter(state)
-    local vf_table = mp.get_property_native('vf')
-    if #vf_table > 0 then
-        for i = #vf_table, 1, -1 do
-            if vf_table[i].label == 'blackout' then
-                vf_table[i].enabled = state
-                vf_table[i].params  = { graph = 'nullsink,color=c=black:s=' .. dim(state) }
-                mp.set_property_native('vf', vf_table)
-                break
-            end
-        end
-    end
-end
-
-function silenceTrigger(name, value)
-    if value == '{}' or value == nil then
-        return
-    end
-
-    local skipTime = tonumber(string.match(value, '%d+%.?%d+'))
-    local currTime = getTime()
-
-    if skipTime == nil or skipTime < currTime + ONE_SECOND then
-        return
-    end
-
-    stopSkip()
-    setTime(skipTime)
-    skip = false
-
-    -- 记忆功能
+function set_anchor()
     local series = get_series_name()
-    if series and skipTime >= opts.min_skip and skipTime <= opts.max_skip then
-        memory[series] = skipTime
-        save_memory()
-        mp.osd_message(string.format("已记住「%s」片头结束于 %.1f 秒", series, skipTime), opts.osd_time)
-    else
-        mp.osd_message(string.format("跳过到 %.1f 秒", skipTime), opts.osd_time)
+    if not series then
+        mp.osd_message("Cannot detect series name", opts.osd_time)
+        return
+    end
+    local t = getTime()
+    if t < opts.min_skip or t > opts.max_skip then
+        mp.osd_message(string.format("%.1fs out of range (%d–%d)", t, opts.min_skip, opts.max_skip), opts.osd_time)
+        return
+    end
+    memory[series] = t
+    save_memory(series, t)
+    mp.osd_message(string.format("Anchor set: \"%s\" → %.1fs", series, t), opts.osd_time)
+end
+
+local function stop_scrub()
+    if scrub_timer then
+        scrub_timer:kill()
+        scrub_timer = nil
     end
 end
 
-function setAudioTrigger(state)
-    if state == true then
-        mp.observe_property('af-metadata/silencedetect', 'string', silenceTrigger)
-    else
-        mp.unobserve_property(silenceTrigger)
+local function start_scrub(forward)
+    stop_scrub()
+    local step = forward and opts.scrub_step or -opts.scrub_step
+    mp.commandv("seek", step, "relative", "exact")
+    scrub_timer = mp.add_periodic_timer(opts.scrub_interval, function()
+        mp.commandv("seek", step, "relative", "exact")
+    end)
+end
+
+function on_tab(state)
+    if state.event == "down" then
+        start_scrub(true)
+    elseif state.event == "up" then
+        stop_scrub()
+        set_anchor()
     end
 end
 
-function startSkip()
-    startTime = getTime()
-    -- This audio filter detects moments of silence
-    setAudioFilter(true)
-    -- This video filter makes fast-forward faster
-    setVideoFilter(true)
-    setAudioTrigger(true)
-    setPause(false)
-    setMute(true)
-    setSpeed(MAX_SPEED)
-end
-
-function stopSkip()
-    setAudioFilter(false)
-    setVideoFilter(false)
-    setAudioTrigger(false)
-    setMute(false)
-    setSpeed(NORMAL_SPEED)
-end
-
-function keypress()
-    skip = not skip
-    if skip then
-        startSkip()
-        mp.osd_message("静音跳过中... (再按 Tab 取消)", opts.osd_time)
-    else
-        stopSkip()
-        setTime(startTime)
-        mp.osd_message("已取消跳过", opts.osd_time)
+function on_shift_tab(state)
+    if state.event == "down" then
+        start_scrub(false)
+    elseif state.event == "up" then
+        stop_scrub()
+        set_anchor()
     end
 end
 
--- 文件加载时自动跳转
 function on_file_loaded()
     if not opts.auto_skip then return end
     local series = get_series_name()
     if not series then return end
-
     local t = memory[series]
-    if t and type(t) == "number" and t >= opts.min_skip then
-        mp.add_timeout(0.4, function()
-            local cur = getTime() or 0
-            if cur < t - 2 then
-                setTime(t)
-                mp.osd_message(string.format("自动跳过「%s」片头 → %.1f 秒", series, t), opts.osd_time)
-            end
-        end)
-    end
-end
+    if type(t) ~= "number" or t < opts.min_skip then return end
 
--- 清除当前系列记忆
-function clear_current()
-    local series = get_series_name()
-    if series and memory[series] then
-        memory[series] = nil
-        save_memory()
-        mp.osd_message("已清除「" .. series .. "」的片头记忆", opts.osd_time)
-    else
-        mp.osd_message("当前没有可清除的记忆", opts.osd_time)
-    end
+    setTime(t)
+    mp.osd_message(string.format("Skip \"%s\" → %.1fs", series, t), opts.osd_time)
 end
 
 setOptions()
 load_memory()
-initAudioFilter()
-initVideoFilter()
-
-mp.add_key_binding('Tab', 'skip-key', keypress)
-mp.add_key_binding('Ctrl+Tab', 'clear-intro-memory', clear_current)
+mp.add_key_binding('Tab', 'intro-tab', on_tab, {complex = true})
+mp.add_key_binding('Shift+Tab', 'intro-shift-tab', on_shift_tab, {complex = true})
 mp.register_event('file-loaded', on_file_loaded)
