@@ -42,14 +42,16 @@ function setMute(state)
     mp.set_property_bool('mute', state)
 end
 
--- 从 media-title 提取系列名，例如 "[gua] 无上神帝 / 第10集" → "无上神帝"
+-- 从 media-title 提取系列名
+-- 只去掉前缀 [xxx] 和后缀 " - xxx"
+-- 例: "[vod] 我独自盗墓 - 第06集" → "我独自盗墓"
 function get_series_name()
     local title = mp.get_property("media-title") or ""
-    title = title:gsub("^%[[^%]]+%]%s*", "")          -- 去掉 [gua]
-    local series = title:match("^(.-)%s*/%s*第") or title:match("^(.-)%s*第%d") or title
-    series = series:match("^%s*(.-)%s*$")              -- trim
-    if series == "" then return nil end
-    return series
+    title = title:gsub("^%[[^%]]+%]%s*", "")   -- 去掉 [xxx]
+    title = title:gsub("%s*%-.*$", "")          -- 去掉 " - xxx"
+    title = title:match("^%s*(.-)%s*$") or title -- trim
+    if title == "" then return nil end
+    return title
 end
 
 function load_memory()
