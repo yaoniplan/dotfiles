@@ -2,6 +2,8 @@
 import sys, json, os, importlib
 
 STATE_FILE = "/tmp/ani_playlist.json"
+MAX_RETRIES = 3
+
 
 def find_provider_module(source_name):
     """在 providers/ 下找到 name 匹配 source_name 的模块"""
@@ -19,6 +21,7 @@ def find_provider_module(source_name):
         except Exception:
             continue
     return None, None
+
 
 def main():
     if len(sys.argv) < 2:
@@ -66,10 +69,19 @@ def main():
         sys.exit(1)
 
     track = tracks[new_idx]
-    try:
-        play_url = provider.resolve_play(track)
-    except Exception as e:
-        print(f"resolve error: {e}", file=sys.stderr)
+    play_url = None
+    last_err = None
+    for _ in range(MAX_RETRIES):
+        try:
+            play_url = provider.resolve_play(track)
+            if play_url and str(play_url).startswith(("http://", "https://")):
+                break
+            last_err = Exception(f"invalid url: {play_url!r}")
+        except Exception as e:
+            last_err = e
+        play_url = None
+    if not play_url:
+        print(f"resolve error: {last_err}", file=sys.stderr)
         sys.exit(1)
 
     # 更新状态文件
@@ -81,6 +93,7 @@ def main():
     title = f"[{source}] {state['title']} - {track['name']}"
     print(play_url)
     print(title)
+
 
 if __name__ == "__main__":
     main()

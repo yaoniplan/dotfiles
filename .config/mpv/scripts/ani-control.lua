@@ -11,6 +11,7 @@ mp.add_hook("on_load", 50, function()
     local source, index = url:match("^ani%-playlist://(.+)/(%d+)$")
     if not source or not index then
         mp.msg.warn("invalid ani-playlist URL: " .. url)
+        mp.command("quit")
         return
     end
 
@@ -24,6 +25,7 @@ mp.add_hook("on_load", 50, function()
 
     if proc.status ~= 0 then
         mp.msg.warn("resolve failed: " .. (proc.stderr or ""))
+        mp.command("quit")
         return
     end
 
@@ -34,6 +36,7 @@ mp.add_hook("on_load", 50, function()
     end
     if #lines < 2 then
         mp.msg.warn("invalid output from resolver")
+        mp.command("quit")
         return
     end
 
