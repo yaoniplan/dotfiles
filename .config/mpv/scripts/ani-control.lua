@@ -1,5 +1,5 @@
 -- https://github.com/yaoniplan/dotfiles/tree/master/.local/src/ani
-local resolver = "/home/yaoniplan/.local/src/ani/ani-resolve.py"
+local resolver = os.getenv("HOME") .. "/.local/src/ani/ani-resolve.py"
 
 mp.add_hook("on_load", 50, function()
     local url = mp.get_property("stream-open-filename", "")
