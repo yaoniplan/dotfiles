@@ -10,7 +10,7 @@ def main():
     else:
         text = input("URL: ")
 
-    print(quote(text, safe=":/?#[]@!$&*,;="))
+    print(quote(text, safe=":/"))
 
 
 if __name__ == "__main__":
