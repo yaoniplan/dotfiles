@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Dependencies: tofi, grim, hyprctl, jq, slurp, wl-copy, notify-send, scrot, xclip, xsel, niri
+# Dependencies: tofi, grim, hyprctl, jq, slurp, wl-copy, notify-send, swappy, scrot, xclip, xsel, niri
 
 # === CONFIG ===
 screenshot_dir="$HOME"
