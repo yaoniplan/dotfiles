@@ -199,8 +199,9 @@ def run_fzf(configs: list[str], current_basename: str) -> tuple[str, str, str]:
         text=True
     )
     out, err = proc.communicate("\n".join(configs) + ("\n" if configs else ""))
-    if proc.returncode != 0:
-        sys.exit(0)
+
+    # 移除原本的 if proc.returncode != 0: sys.exit(0)
+    # 这样当输入新 URL 导致 fzf 返回非零状态码时，仍可正常读取 `--print-query` 的内容。
 
     lines = out.splitlines()
     query = ""
