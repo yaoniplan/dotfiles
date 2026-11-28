@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         Yaoniplan Outline
 // @namespace    https://github.com/yaoniplan/dotfiles/tree/master/.local/src/userscript
-// @version      1.0.0
-// @description  On-demand Markdown contents sidebar with an invisible Vimium-accessible toggle, current-heading highlighting, and history-free navigation without tap flashes.
+// @version      1.0.1
+// @description  On-demand Markdown contents sidebar with instant layout changes, a Vimium-accessible toggle, current-heading highlighting, and history-free navigation.
 // @match        https://yaoniplan.eu.org/*
 // @icon         data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIiB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIj4KICA8IS0tIE91dGVyIGNpcmNsZSAtLT4KICA8Y2lyY2xlIGN4PSIyNTYiIGN5PSIyNTYiIHI9IjIzNiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIzNCIgLz4KCiAgPCEtLSBVcHBlciByb3c6IGhvbGxvdyByaW5nICsgbGluZSAtLT4KICA8Y2lyY2xlIGN4PSIxNzIiIGN5PSIxNzIiIHI9IjQyIiBmaWxsPSJub25lIiBzdHJva2U9ImJsYWNrIiBzdHJva2Utd2lkdGg9IjI4IiAvPgogIDxsaW5lIHgxPSIyNTYiIHkxPSIxNzIiIHgyPSIzOTYiIHkyPSIxNzIiIHN0cm9rZT0iYmxhY2siIHN0cm9rZS13aWR0aD0iMjgiIHN0cm9rZS1saW5lY2FwPSJidXR0IiAvPgoKICA8IS0tIExvd2VyIHJvdzogaG9sbG93IHJpbmcgKyBsaW5lIC0tPgogIDxjaXJjbGUgY3g9IjE3MiIgY3k9IjM0MCIgcj0iNDIiIGZpbGw9Im5vbmUiIHN0cm9rZT0iYmxhY2siIHN0cm9rZS13aWR0aD0iMjgiIC8+CiAgPGxpbmUgeDE9IjI1NiIgeTE9IjM0MCIgeDI9IjM5NiIgeTI9IjM0MCIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIyOCIgc3Ryb2tlLWxpbmVjYXA9ImJ1dHQiIC8+Cjwvc3ZnPgo=
 // @author       yaoniplan
@@ -19,12 +19,35 @@
 
   const style = document.createElement('style');
   style.textContent = `
+    .tm-md-layout {
+      --tm-md-panel-width: min(280px, 45vw);
+      display: flex;
+      align-items: flex-start;
+      width: 100%;
+    }
+    .tm-md-layout > #markdown-content {
+      flex: 1 1 0;
+      min-width: 0;
+      width: 100%;
+    }
+    /* The rail occupies real layout space beside the Markdown column. */
+    .tm-md-rail {
+      position: sticky;
+      top: 0;
+      align-self: flex-start;
+      flex: 0 0 auto;
+      width: 0;
+      height: 100vh;
+      height: 100dvh;
+      overflow: hidden;
+      transition: none !important;
+    }
+    .tm-md-rail.tm-md-open { width: var(--tm-md-panel-width); }
     .tm-md-contents.markdown-body {
-      display: none;
-      position: fixed;
+      display: block;
+      position: absolute;
       inset: 0 0 0 auto;
-      z-index: 20;
-      width: min(280px, 90vw);
+      width: var(--tm-md-panel-width);
       max-width: none;
       min-width: 0;
       margin: 0;
@@ -37,9 +60,37 @@
       box-sizing: border-box;
       overflow-y: auto;
       overscroll-behavior: contain;
+      visibility: hidden;
+      transition: none !important;
+      scroll-behavior: auto !important;
     }
-    .tm-md-contents.markdown-body.tm-md-open:not([hidden]) { display: block; }
-    .tm-md-contents[hidden], .tm-md-toggle[hidden] { display: none !important; }
+    .tm-md-open > .tm-md-contents.markdown-body {
+      visibility: visible;
+    }
+    /* On narrow screens both columns keep their full widths and move as one
+       strip. The viewport clips the offscreen column without reflowing it. */
+    @media (max-width: 767px) {
+      .tm-md-layout {
+        --tm-md-panel-width: min(280px, 85vw);
+        overflow-x: clip;
+        overflow-y: visible;
+      }
+      .tm-md-layout > #markdown-content {
+        flex: 0 0 100%;
+        max-width: 100%;
+        transition: none !important;
+      }
+      .tm-md-layout > .tm-md-rail,
+      .tm-md-layout > .tm-md-rail.tm-md-open {
+        width: var(--tm-md-panel-width);
+        transition: none !important;
+      }
+      .tm-md-layout.tm-md-layout-open > #markdown-content,
+      .tm-md-layout.tm-md-layout-open > .tm-md-rail {
+        transform: translateX(calc(-1 * var(--tm-md-panel-width)));
+      }
+    }
+    .tm-md-toggle[hidden] { display: none !important; }
     .tm-md-toggle {
       position: fixed;
       top: max(14px, env(safe-area-inset-top));
@@ -127,11 +178,21 @@
   nav.className = 'tm-md-contents markdown-body';
   nav.id = 'tm-md-contents-panel';
   nav.setAttribute('aria-label', 'Table of contents');
-  nav.hidden = true;
+  nav.setAttribute('aria-hidden', 'true');
+  nav.inert = true;
   const list = document.createElement('ol');
   list.className = 'tm-md-list';
   nav.appendChild(list);
-  document.body.append(nav, button);
+
+  // Keep the original content node and headings intact; only wrap its layout.
+  const layout = document.createElement('div');
+  layout.className = 'tm-md-layout';
+  const rail = document.createElement('div');
+  rail.className = 'tm-md-rail';
+  content.before(layout);
+  layout.append(content, rail);
+  rail.appendChild(nav);
+  document.body.appendChild(button);
 
   let isOpen = false;
   let entries = [];
@@ -180,11 +241,12 @@
   }
   window.addEventListener('scroll', scheduleCurrentHeading, { passive: true });
   window.addEventListener('resize', scheduleCurrentHeading, { passive: true });
-
   function setOpen(open) {
     isOpen = open;
-    nav.hidden = !open;
-    nav.classList.toggle('tm-md-open', open);
+    rail.classList.toggle('tm-md-open', open);
+    layout.classList.toggle('tm-md-layout-open', open);
+    nav.inert = !open;
+    nav.setAttribute('aria-hidden', String(!open));
     button.setAttribute('aria-expanded', String(open));
     if (open) {
       updateCurrentHeading();
@@ -199,14 +261,11 @@
     if (event.persisted) setOpen(false);
   });
   button.addEventListener('click', () => setOpen(!isOpen));
-  list.addEventListener('click', event => {
-    if (event.target.closest('a')) setOpen(false);
-  });
   document.addEventListener('click', event => {
-    if (!nav.hidden && !nav.contains(event.target) && !button.contains(event.target)) setOpen(false);
+    if (isOpen && !nav.contains(event.target) && !button.contains(event.target)) setOpen(false);
   });
   document.addEventListener('keydown', event => {
-    if (event.key === 'Escape' && !nav.hidden) {
+    if (event.key === 'Escape' && isOpen) {
       setOpen(false);
       button.focus();
     }
@@ -236,7 +295,9 @@
         // change the URL and add an entry to the browser's history.
         link.addEventListener('click', event => {
           event.preventDefault();
-          heading.scrollIntoView();
+          setOpen(false);
+          // Avoid horizontal scrolling and override any page-level smooth scroll.
+          window.scrollTo({ top: window.scrollY + heading.getBoundingClientRect().top, left: window.scrollX, behavior: 'instant' });
         });
         link.addEventListener('auxclick', event => event.preventDefault());
         link.textContent = heading.textContent.trim();
@@ -259,4 +320,3 @@
   observer.observe(content, { childList: true, subtree: true, characterData: true });
   refresh();
 })();
-
